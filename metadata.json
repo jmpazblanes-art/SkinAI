@@ -1,0 +1,7 @@
+{
+  "name": "Skinity",
+  "description": "An AI-powered web application for facial skin analysis. Users can upload a photo of their face to receive a detailed analysis of their skin type, identify potential issues, and get personalized recommendations for daily routines and products.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
