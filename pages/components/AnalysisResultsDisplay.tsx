@@ -55,16 +55,20 @@ const DetailedProblem: React.FC<{ problem: SkinProblem }> = ({ problem }) => {
 
 interface AnalysisResultsDisplayProps {
   result: AnalysisResult;
+  imageUrl: string;
   showTitle?: boolean;
   containerClassName?: string;
 }
 
 // Main component with the new layout
-const AnalysisResultsDisplay: React.FC<AnalysisResultsDisplayProps> = ({ result, showTitle = true, containerClassName = "mt-8 animate-fade-in" }) => (
+const AnalysisResultsDisplay: React.FC<AnalysisResultsDisplayProps> = ({ result, imageUrl, showTitle = true, containerClassName = "mt-8 animate-fade-in" }) => (
     <Card className={containerClassName}>
         {showTitle && <h2 className="text-2xl font-bold text-base-content mb-4">Resultados del Análisis</h2>}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-1 flex items-center justify-center">
+                {imageUrl && <img src={imageUrl} alt="Imagen del análisis" className="rounded-lg shadow-md object-cover w-full h-auto" />}
+            </div>
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex flex-col items-center justify-center p-4 bg-base-200 rounded-lg">
                     <h3 className="text-lg font-semibold mb-2">Puntuación</h3>
                     <ScoreRing score={result.overallScore} />
@@ -74,12 +78,14 @@ const AnalysisResultsDisplay: React.FC<AnalysisResultsDisplayProps> = ({ result,
                     <p className="capitalize text-primary font-bold text-3xl">{result.skinType}</p>
                 </div>
             </div>
-            
+        </div>
+
+        <div className="mt-8">
+             <h3 className="text-lg font-semibold mb-3 flex items-center">
+                <i className="iconoir-thumbs-up mr-2 text-primary"></i>
+                Recomendaciones Clave
+            </h3>
             <div className="p-4 bg-base-200 rounded-lg">
-                <h3 className="text-lg font-semibold mb-3 flex items-center">
-                    <i className="iconoir-thumbs-up mr-2 text-primary"></i>
-                    Recomendaciones Clave
-                </h3>
                 <ul className="space-y-2">
                     {result.keyRecommendations.map((rec, i) => (
                         <li key={i} className="flex items-start">

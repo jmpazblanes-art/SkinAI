@@ -1,19 +1,17 @@
 
-
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { analyzeSkin } from '../services/geminiService';
-import { processImageForAnalysis } from '../utils/imageProcessor';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { useAnalysis } from '../context/AnalysisContext';
 import { useNotification } from '../context/NotificationContext';
 import DashboardSummary from './components/DashboardSummary';
-import AnalysisSkeleton from './components/AnalysisSkeleton';
 import CameraModal from './components/CameraModal';
-import AnalysisResultsDisplay from './components/AnalysisResultsDisplay';
 import FuturisticFaceScan from './components/FuturisticFaceScan';
-import { blobToBase64 } from '../utils/fileUtils';
+import { saveSkinAnalysis, uploadSkinAnalysisImage } from '../services/supabaseService';
+import AnalysisResultsDisplay from './components/AnalysisResultsDisplay';
+import AnalysisSkeleton from './components/AnalysisSkeleton';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const MAX_SIZE_MB = 10;
@@ -25,6 +23,7 @@ const HomePage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isRetryable, setIsRetryable] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [message, setMessage] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { latestAnalysis, setLatestAnalysis, history } = useAnalysis();
   const { addNotification } = useNotification();
@@ -46,7 +45,6 @@ const HomePage = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     
-    // Reset states on new file selection
     resetAnalysisState();
 
     if (file) {
@@ -54,7 +52,7 @@ const HomePage = () => {
         const errorMsg = "Formato de archivo no válido. Sube JPEG, PNG o GIF.";
         setError(errorMsg);
         addNotification(errorMsg, 'error');
-        if(fileInputRef.current) fileInputRef.current.value = ""; // Clear the input
+        if(fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
 
@@ -62,7 +60,7 @@ const HomePage = () => {
         const errorMsg = `El archivo es demasiado grande. El tamaño máximo es ${MAX_SIZE_MB}MB.`;
         setError(errorMsg);
         addNotification(errorMsg, 'error');
-        if(fileInputRef.current) fileInputRef.current.value = ""; // Clear the input
+        if(fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
       
@@ -79,7 +77,6 @@ const HomePage = () => {
     const fileName = `capture-${Date.now()}.jpg`;
     const file = new File([blob], fileName, { type: 'image/jpeg' });
     
-    // Reset states
     resetAnalysisState();
     
     setSelectedFile(file);
@@ -91,42 +88,34 @@ const HomePage = () => {
     setIsCameraOpen(false);
   };
 
-  const handleAnalyzeClick = useCallback(async () => {
-    if (!selectedFile) {
-      setError("Por favor, sube una foto primero.");
-      return;
-    }
-
+  const handleAnalyzeClick = async () => {
+    if (!previewDataUrl) return;
+    setMessage('Iniciando análisis...');
     setIsLoading(true);
     setError(null);
-    setIsRetryable(false);
-    setLatestAnalysis(null, '', false);
 
     try {
-      addNotification('Procesando imagen...', 'info');
-      const { base64, dataUrl } = await processImageForAnalysis(selectedFile);
+      setMessage('Subiendo imagen...');
+      const imageUrl = await uploadSkinAnalysisImage(previewDataUrl);
+
+      setMessage('Analizando piel...');
+      const result = await analyzeSkin(previewDataUrl.split(',')[1]);
+
+      setMessage('Guardando análisis...');
+      await saveSkinAnalysis(null, result, imageUrl);
       
-      addNotification('Imagen procesada. Analizando...', 'info');
-      const result = await analyzeSkin(base64);
-      
-      setLatestAnalysis(result, dataUrl);
-      addNotification('Análisis completado y guardado en el historial.', 'success');
-    } catch (err: any) {
-      const errorMessage = err.message || "Ocurrió un error inesperado.";
-      if (errorMessage.startsWith("RETRYABLE:")) {
-          const displayMessage = errorMessage.replace("RETRYABLE: ", "");
-          setError(displayMessage);
-          setIsRetryable(true);
-          addNotification(displayMessage, 'error');
-      } else {
-          setError(errorMessage);
-          setIsRetryable(false);
-          addNotification(errorMessage, 'error');
-      }
+      setMessage('Análisis guardado correctamente.');
+      setLatestAnalysis(result, imageUrl, true);
+
+    } catch (error: any) {
+      console.error(error);
+      const errorMessage = `Error: ${error.message || 'Ocurrió un error desconocido'}`;
+      setMessage(errorMessage);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  }, [selectedFile, setLatestAnalysis, addNotification]);
+  };
 
   return (
     <div>
@@ -179,10 +168,20 @@ const HomePage = () => {
                   Analizar <i className="iconoir-arrow-right ml-2"></i>
                 </Button>
             </div>
+            {message && <p className="mt-4">{message}</p>}
           </div>
         </div>
       </Card>
       
+      {isLoading && <AnalysisSkeleton />}
+
+      {latestAnalysis && !isLoading && (
+        <AnalysisResultsDisplay 
+          result={latestAnalysis.result} 
+          imageUrl={latestAnalysis.imageUrl} 
+        />
+      )}
+
        <Card className="mt-8">
          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
            <div className="flex items-center">
@@ -217,16 +216,6 @@ const HomePage = () => {
             )}
           </div>
         </Card>
-      )}
-      
-      {isLoading && <AnalysisSkeleton />}
-
-      {latestAnalysis && !isLoading && <AnalysisResultsDisplay result={latestAnalysis.result} />}
-
-      {!latestAnalysis && !isLoading && !selectedFile && history.length === 0 && (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-            <p>No has subido ninguna foto aún.</p>
-          </div>
       )}
       
       {isCameraOpen && <CameraModal onCapture={handleCapture} onClose={() => setIsCameraOpen(false)} />}

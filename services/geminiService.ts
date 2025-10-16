@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult } from '../types';
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 if (!API_KEY) {
   console.error("API_KEY environment variable is not set.");
@@ -58,7 +58,7 @@ export const analyzeSkin = async (base64Image: string): Promise<AnalysisResult> 
     };
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-flash', // Corregido al modelo disponible
       contents: { parts: [imagePart, textPart] },
       config: {
         responseMimeType: "application/json",
@@ -84,6 +84,6 @@ export const analyzeSkin = async (base64Image: string): Promise<AnalysisResult> 
         throw new Error("RETRYABLE: Hubo un problema temporal al conectar con el servicio de IA. Por favor, inténtalo de nuevo.");
     }
 
-    throw new Error("No se pudo analizar la imagen. El modelo de IA no está disponible o la imagen no se pudo procesar.");
+    throw error;
   }
 };

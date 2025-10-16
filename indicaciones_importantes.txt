@@ -1,0 +1,47 @@
+###############################################################
+# INSTRUCCIONES PRINCIPALES PARA EL AGENTE GEMINI (VS CODE)
+# PROYECTO: SKINITY - ANÁLISIS DE PIEL CON IA
+###############################################################
+
+1️⃣  IMPORTANTE: NO MODIFICAR EL DISEÑO BASE
+- No cambies la estructura visual del menú lateral ni el layout principal.
+- Mantén la tipografía, colores, bloques y proporciones tal y como se muestran en la versión original de Google AI Studio.
+- Antes de tocar cualquier archivo de diseño (App.jsx, Layout.jsx, Sidebar.jsx o similares), pregunta primero.
+
+2️⃣  LÍMITES DE EDICIÓN
+- Puedes editar componentes funcionales (por ejemplo, lógica de integración con Supabase, Stripe o IA facial).
+- No reestructures elementos del DOM ni cambies las rutas / estructura visual.
+- Antes de integrar cualquier API, consulta o revisa los endpoints existentes.
+
+3️⃣  SUPABASE
+- Añade solo la lógica necesaria: login, registro, guardar resultados y obtener datos de usuario.
+- Mantén visible y funcional la navegación lateral.
+- NO modifiques ni reemplaces el layout del menú.
+
+4️⃣  STRIPE
+- Los planes son:
+  - plan mensual → 3.99€
+  - plan anual → 39.99€
+- Reutiliza los componentes de pago existentes.
+- No cambies estilos visuales, fuentes o botones sin aprobación previa.
+
+5️⃣  IA DE ANÁLISIS FACIAL
+- Inserta la lógica o las funciones dentro del componente correspondiente.
+- No cambies imágenes, iconos ni posiciones visuales.
+
+6️⃣  PROCESO DE TRABAJO
+- Antes de aplicar cambios grandes, muestra una vista previa o el bloque de código.
+- Espera confirmación antes de ejecutar modificaciones que afecten a la interfaz.
+- Después de cada cambio importante, guarda una copia (commit o duplicado).
+- Documenta las rutas modificadas en un archivo “cambios.txt”.
+
+7️⃣  ESTILO DEL CÓDIGO
+- Mantén los nombres originales de los componentes.
+- Usa comentarios claros en inglés tipo “// Added Supabase integration” o “// Stripe logic here”.
+- No borres funciones previas; comenta en lugar de eliminar.
+
+8️⃣  COMUNICACIÓN
+- Antes de comenzar: leer completamente este archivo.
+- En cada inicio de sesión, confirma haber leído y entendido estas instrucciones.
+- Ante cualquier duda sobre estructura o diseño, preguntar antes de modificar.
+###############################################################
