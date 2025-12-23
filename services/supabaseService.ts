@@ -188,19 +188,45 @@ export interface AffiliateProduct {
 }
 
 export const getAffiliateProducts = async (ingredientKeys: string[]): Promise<AffiliateProduct[]> => {
-  if (!ingredientKeys || ingredientKeys.length === 0) return [];
+  if (!ingredientKeys) return [];
 
-  const { data, error } = await supabase
-    .from('affiliate_products')
-    .select('*')
-    .in('ingredient_key', ingredientKeys);
+  const selectFields = 'id, product_name, affiliate_url, image_url, price_tier, ingredient_key';
 
-  if (error) {
+  try {
+    let products: AffiliateProduct[] = [];
+
+    if (ingredientKeys.length > 0) {
+      // Búsqueda difusa (fuzzy search) similar a la Edge Function
+      const orFilter = ingredientKeys
+        .map(key => `ingredient_key.ilike.%${key}%,product_name.ilike.%${key}%`)
+        .join(',');
+
+      const { data, error } = await supabase
+        .from('affiliate_products')
+        .select(selectFields)
+        .or(orFilter)
+        .limit(10);
+
+      if (error) throw error;
+      products = data as any[] || [];
+    }
+
+    // Fallback si no hay resultados
+    if (products.length === 0) {
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('affiliate_products')
+        .select(selectFields)
+        .limit(5);
+
+      if (fallbackError) throw fallbackError;
+      products = fallbackData as any[] || [];
+    }
+
+    return products;
+  } catch (error) {
     console.error('Error fetching affiliate products:', error);
     return [];
   }
-
-  return data || [];
 };
 
 export const getSubscriptionTier = async (userId: string): Promise<'free' | 'pro'> => {

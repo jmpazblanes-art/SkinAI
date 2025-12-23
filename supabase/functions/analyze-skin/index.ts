@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7"
-import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.2.1"
+import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.21.0"
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -25,7 +25,7 @@ serve(async (req) => {
 
         // Inicializar Gemini
         const genAI = new GoogleGenerativeAI(Deno.env.get('GOOGLE_API_KEY') || '')
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" })
 
         const prompt = `Actúa como un experto en dermocosmética. Analiza la piel de la imagen. 
     IMPORTANTE: Usa un lenguaje estrictamente cosmético. ESTÁ PROHIBIDO usar términos médicos, diagnósticos, 'curas' o 'tratamientos'. 
@@ -81,26 +81,51 @@ serve(async (req) => {
 
         const uniqueKeys = [...new Set(ingredientKeys)]
 
+        console.log('Ingredientes detectados por Gemini:', uniqueKeys)
+
         let products = []
+        const selectFields = 'id, product_name, affiliate_url, image_url, price_tier, ingredient_key'
+
         if (uniqueKeys.length > 0) {
-            const { data } = await supabase
+            // Construir filtro OR para búsqueda parcial (fuzzy search)
+            const orFilter = uniqueKeys
+                .map(key => `ingredient_key.ilike.%${key}%,product_name.ilike.%${key}%`)
+                .join(',')
+
+            const { data, error: searchError } = await supabase
                 .from('affiliate_products')
-                .select('*')
-                .in('ingredient_key', uniqueKeys)
+                .select(selectFields)
+                .or(orFilter)
                 .limit(5)
 
+            if (searchError) console.error('Error en búsqueda de productos:', searchError)
             products = data || []
+        }
+
+        console.log(`Productos encontrados por ingredientes: ${products.length}`)
+
+        // FALLBACK OBLIGATORIO: Si no hay productos, traer 5 productos genéricos
+        if (products.length === 0) {
+            console.log('Aplicando fallback obligatorio: No se encontraron coincidencias, trayendo productos genéricos.')
+            const { data: fallbackData, error: fallbackError } = await supabase
+                .from('affiliate_products')
+                .select(selectFields)
+                .limit(5)
+
+            if (fallbackError) console.error('Error en fallback de productos:', fallbackError)
+            products = fallbackData || []
+            console.log(`Productos entregados por fallback: ${products.length}`)
         }
 
         // Respuesta final
         const finalResponse = {
             success: true,
-            analysis_id: crypto.randomUUID(), // Simulando un ID si no estamos guardando aún en DB desde aquí
+            analysis_id: crypto.randomUUID(),
             analisis: {
                 tipo_piel: rawAnalysis.tipo_piel,
                 caracteristicas: rawAnalysis.preocupaciones,
-                edad_aparente: 25, // Opcional, Gemini puede estimarlo si se pide
-                puntuacion: 85 // Opcional
+                edad_aparente: 25,
+                puntuacion: 85
             },
             mensaje_motivador: rawAnalysis.mensaje_motivador,
             rutina: rawAnalysis.rutina,
