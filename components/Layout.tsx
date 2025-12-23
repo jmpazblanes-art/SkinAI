@@ -7,21 +7,21 @@ import { useReminder } from '../hooks/useReminder';
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
   useReminder();
-  
+
   return (
     <div className="flex h-screen bg-base-200 text-base-content">
       <Sidebar />
-      
+
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="flex justify-between items-center p-4 bg-base-100 shadow-sm flex-shrink-0">
           <div className="flex-1"></div>
           <div className="flex-1 flex justify-center">
             <div className="flex items-center gap-3">
               <div className="bg-gradient-to-br from-secondary to-primary p-2 rounded-lg shadow-sm">
-                  <i className="iconoir-camera text-3xl text-white"></i>
+                <i className="iconoir-camera text-3xl text-white"></i>
               </div>
               <h1 className="text-4xl font-bold text-base-content">
-                  Skin<span className="bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">ity</span>
+                Skin<span className="bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">AI</span>
               </h1>
             </div>
           </div>
@@ -39,6 +39,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </header>
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-base-200 p-4 sm:p-6 lg:p-8">
           {children}
+          <footer className="py-6 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Sugerencias orientativas · No es consejo médico · Consulta a un profesional
+            </p>
+          </footer>
         </main>
       </div>
       <NotificationContainer />

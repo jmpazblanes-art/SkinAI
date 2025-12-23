@@ -1,17 +1,18 @@
-
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { analyzeSkin } from '../services/geminiService';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { useAnalysis } from '../context/AnalysisContext';
 import { useNotification } from '../context/NotificationContext';
+import { useAuth } from '../hooks/useAuth';
 import DashboardSummary from './components/DashboardSummary';
 import CameraModal from './components/CameraModal';
 import FuturisticFaceScan from './components/FuturisticFaceScan';
-import { saveSkinAnalysis, uploadSkinAnalysisImage } from '../services/supabaseService';
 import AnalysisResultsDisplay from './components/AnalysisResultsDisplay';
 import AnalysisSkeleton from './components/AnalysisSkeleton';
+import { callSkinAnalysisWebhook } from '../lib/n8n-webhooks';
+import { getAffiliateProducts } from '../services/supabaseService';
+import PremiumLock from '../components/PremiumLock';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const MAX_SIZE_MB = 10;
@@ -27,6 +28,7 @@ const HomePage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { latestAnalysis, setLatestAnalysis, history } = useAnalysis();
   const { addNotification } = useNotification();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (latestAnalysis && !selectedFile) {
@@ -44,7 +46,7 @@ const HomePage = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    
+
     resetAnalysisState();
 
     if (file) {
@@ -52,7 +54,7 @@ const HomePage = () => {
         const errorMsg = "Formato de archivo no válido. Sube JPEG, PNG o GIF.";
         setError(errorMsg);
         addNotification(errorMsg, 'error');
-        if(fileInputRef.current) fileInputRef.current.value = "";
+        if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
 
@@ -60,10 +62,10 @@ const HomePage = () => {
         const errorMsg = `El archivo es demasiado grande. El tamaño máximo es ${MAX_SIZE_MB}MB.`;
         setError(errorMsg);
         addNotification(errorMsg, 'error');
-        if(fileInputRef.current) fileInputRef.current.value = "";
+        if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
-      
+
       setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -76,9 +78,9 @@ const HomePage = () => {
   const handleCapture = (blob: Blob) => {
     const fileName = `capture-${Date.now()}.jpg`;
     const file = new File([blob], fileName, { type: 'image/jpeg' });
-    
+
     resetAnalysisState();
-    
+
     setSelectedFile(file);
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -93,25 +95,61 @@ const HomePage = () => {
     setMessage('Iniciando análisis...');
     setIsLoading(true);
     setError(null);
+    setIsRetryable(false);
 
     try {
-      setMessage('Subiendo imagen...');
-      const imageUrl = await uploadSkinAnalysisImage(previewDataUrl);
+      // Enviar imagen al webhook de N8N
+      setMessage('Analizando tu piel con IA dermatológica...');
+      const webhookResponse = await callSkinAnalysisWebhook(user?.id || '', previewDataUrl);
 
-      setMessage('Analizando piel...');
-      const result = await analyzeSkin(previewDataUrl.split(',')[1]);
+      console.log('📦 Respuesta completa del webhook:', webhookResponse);
 
-      setMessage('Guardando análisis...');
-      await saveSkinAnalysis(null, result, imageUrl);
-      
-      setMessage('Análisis guardado correctamente.');
-      setLatestAnalysis(result, imageUrl, true);
+      if (!webhookResponse.success) {
+        throw new Error(webhookResponse.error || (webhookResponse as any).message || 'No se pudo completar el análisis');
+      }
+
+      // Parsear la respuesta del webhook a la nueva estructura AnalysisResult
+      const rawAnalysis = webhookResponse;
+
+      // Construir el objeto AnalysisResult
+      const analysisResult: any = {
+        analisis: {
+          tipo_piel: webhookResponse.analisis?.tipo_piel || 'normal',
+          edad_aparente: webhookResponse.analisis?.edad_aparente || 25,
+          puntuacion: webhookResponse.analisis?.puntuacion || 75,
+          caracteristicas: webhookResponse.analisis?.caracteristicas || []
+        },
+        mensaje_motivador: webhookResponse.mensaje_motivador || "¡Tu piel es única, cuídala!",
+        rutina: webhookResponse.rutina || { manana: [], noche: [] }
+      };
+
+      console.log('✅ Análisis completado:', analysisResult);
+
+      // Los productos ya vienen incluidos en la respuesta de la Edge Function
+      const affiliateProducts = webhookResponse.productos || [];
+      (analysisResult as any).affiliateProducts = affiliateProducts;
+
+      setMessage('¡Análisis completado!');
+      setLatestAnalysis(analysisResult, previewDataUrl, true, webhookResponse.analysis_id);
+      addNotification('Análisis completado exitosamente', 'success');
+
+      // Mostrar info de análisis restantes si es usuario free
+      if (webhookResponse.plan_type === 'free') {
+        const restantes = webhookResponse.analisis_restantes;
+        if (restantes === 0) {
+          addNotification('Has agotado tus análisis gratuitos. ¡Actualiza a Pro para análisis ilimitados!', 'warning');
+        } else {
+          addNotification(`Te quedan ${restantes} análisis gratuitos`, 'info');
+        }
+      }
 
     } catch (error: any) {
-      console.error(error);
-      const errorMessage = `Error: ${error.message || 'Ocurrió un error desconocido'}`;
-      setMessage(errorMessage);
+      console.error('❌ Error en análisis:', error);
+      const errorMessage = error.message || 'Ocurrió un error desconocido';
+      setMessage(`Error: ${errorMessage}`);
       setError(errorMessage);
+      addNotification(errorMessage, 'error');
+      setIsRetryable(true);
     } finally {
       setIsLoading(false);
     }
@@ -125,7 +163,7 @@ const HomePage = () => {
       <p className="text-lg text-base-content/80 max-w-2xl mb-6 leading-loose">
         Sube una foto de tu rostro y recibe un análisis detallado de tu piel con recomendaciones personalizadas para mejorar tu cuidado facial.
       </p>
-      
+
       {history.length > 0 && <DashboardSummary history={history} />}
 
       <Card className="mt-8">
@@ -149,58 +187,95 @@ const HomePage = () => {
               aria-labelledby="upload-button"
             />
             <div className="flex flex-wrap gap-4">
-                <Button 
-                    id="upload-button"
-                    onClick={() => fileInputRef.current?.click()} 
-                    variant="secondary"
-                    icon={<i className="iconoir-cloud-upload mr-2"></i>}
-                >
+              <Button
+                id="upload-button"
+                onClick={() => fileInputRef.current?.click()}
+                variant="secondary"
+                icon={<i className="iconoir-cloud-upload mr-2"></i>}
+              >
                 Subir foto
-                </Button>
-                <Button 
-                    onClick={() => setIsCameraOpen(true)}
-                    variant="secondary"
-                    icon={<i className="iconoir-camera mr-2"></i>}
-                >
-                    Tomar foto
-                </Button>
-                <Button onClick={handleAnalyzeClick} isLoading={isLoading} disabled={!selectedFile}>
-                  Analizar <i className="iconoir-arrow-right ml-2"></i>
-                </Button>
+              </Button>
+              <Button
+                onClick={() => setIsCameraOpen(true)}
+                variant="secondary"
+                icon={<i className="iconoir-camera mr-2"></i>}
+              >
+                Tomar foto
+              </Button>
+              <Button onClick={handleAnalyzeClick} isLoading={isLoading} disabled={!selectedFile}>
+                Analizar <i className="iconoir-arrow-right ml-2"></i>
+              </Button>
             </div>
             {message && <p className="mt-4">{message}</p>}
           </div>
         </div>
+        <div className="mt-6 p-4 bg-slate-700/50 border-l-4 border-cyan-500 rounded-r-lg">
+          <p className="text-sm text-base-content/90">
+            <strong>Nota:</strong> Esta herramienta ofrece sugerencias de cuidado facial basadas en inteligencia artificial. Los resultados son orientativos y no constituyen diagnóstico médico. Para cualquier preocupación sobre tu piel, consulta con un profesional de la salud.
+          </p>
+        </div>
       </Card>
-      
+
       {isLoading && <AnalysisSkeleton />}
 
       {latestAnalysis && !isLoading && (
-        <AnalysisResultsDisplay 
-          result={latestAnalysis.result} 
-          imageUrl={latestAnalysis.imageUrl} 
-        />
+        <>
+          <AnalysisResultsDisplay
+            result={latestAnalysis.result}
+            imageUrl={latestAnalysis.imageUrl}
+          />
+          <p className="text-sm text-gray-500 text-center mt-6 px-4">
+            Esta herramienta ofrece sugerencias de cuidado facial basadas en análisis visual con IA. No constituye diagnóstico médico. Para problemas de piel persistentes, consulta con un dermatólogo.
+          </p>
+        </>
       )}
 
-       <Card className="mt-8">
-         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-           <div className="flex items-center">
-             <div className="bg-primary/10 p-3 rounded-full mr-4">
-                <i className="iconoir-light-bulb-on h-8 w-8 text-primary"></i>
-             </div>
-             <div>
-               <h2 className="text-xl font-bold text-base-content">Descubre Consejos de Expertos</h2>
-               <p className="text-base-content/80 mt-1">Explora nuestra colección de consejos para mejorar tu rutina.</p>
-             </div>
-           </div>
-           <Link to="/tips" className="w-full sm:w-auto">
-             <Button variant="secondary" className="w-full sm:w-auto">
-                Ver todos los consejos
-             </Button>
-           </Link>
-         </div>
-       </Card>
-        
+      <Card className="mt-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center">
+            <div className="bg-primary/10 p-3 rounded-full mr-4">
+              <i className="iconoir-light-bulb-on h-8 w-8 text-primary"></i>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-base-content">Descubre Consejos de Expertos</h2>
+              <p className="text-base-content/80 mt-1">Explora nuestra colección de consejos para mejorar tu rutina.</p>
+            </div>
+          </div>
+          <Link to="/tips" className="w-full sm:w-auto">
+            <Button variant="secondary" className="w-full sm:w-auto">
+              Ver todos los consejos
+            </Button>
+          </Link>
+        </div>
+      </Card>
+
+      {/* Expert Chat Section - Locked for Free Users */}
+      <div className="mt-8">
+        <PremiumLock blurAmount="blur-md">
+          <Card className="border border-primary/20 bg-gradient-to-br from-base-100 to-primary/5">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="flex-shrink-0 relative">
+                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                  <i className="iconoir-chat-bubble-check text-4xl text-primary"></i>
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-base-100"></div>
+              </div>
+              <div className="flex-grow text-center md:text-left">
+                <h2 className="text-2xl font-bold text-base-content mb-2">Chat con Dermatólogo IA</h2>
+                <p className="text-base-content/70 mb-4">
+                  ¿Tienes dudas sobre tu rutina? Consulta con nuestro asistente experto entrenado con miles de casos dermatológicos.
+                  Disponible 24/7 para suscriptores Pro.
+                </p>
+                <Button className="w-full md:w-auto shadow-lg shadow-primary/20">
+                  <i className="iconoir-chat-lines mr-2"></i>
+                  Iniciar Consulta
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </PremiumLock>
+      </div>
+
       {error && (
         <Card className="mt-8 border border-red-200 dark:border-red-800/50">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -217,7 +292,7 @@ const HomePage = () => {
           </div>
         </Card>
       )}
-      
+
       {isCameraOpen && <CameraModal onCapture={handleCapture} onClose={() => setIsCameraOpen(false)} />}
     </div>
   );

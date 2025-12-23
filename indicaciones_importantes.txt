@@ -20,7 +20,7 @@
 
 4️⃣  STRIPE
 - Los planes son:
-  - plan mensual → 3.99€
+  - plan mensual → 4.99€
   - plan anual → 39.99€
 - Reutiliza los componentes de pago existentes.
 - No cambies estilos visuales, fuentes o botones sin aprobación previa.

@@ -29,7 +29,7 @@ const SubscriptionPage = () => {
     return (
         <div>
             <h1 className="text-3xl font-bold text-gray-800 text-center mb-2">Elige tu Plan Perfecto</h1>
-            <p className="text-gray-600 text-center mb-10">Desbloquea todo el potencial de Skinity con un plan Pro.</p>
+            <p className="text-gray-600 text-center mb-10">Desbloquea todo el potencial de SkinAI con un plan Pro.</p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
                 <SubscriptionTier 
@@ -50,7 +50,7 @@ const SubscriptionPage = () => {
                 <SubscriptionTier 
                     name="Anual" 
                     price="39,99" 
-                    features={['Todo lo de Pro', 'Ahorra un 20%', 'Consulta anual con experto (simulada)']}
+                    features={['Todo lo de Pro', 'Ahorra un 33%', 'Consulta anual con experto (simulada)']}
                     onSelect={() => setCurrentPlan('Anual')}
                     currentPlan={currentPlan === 'Anual'}
                 />

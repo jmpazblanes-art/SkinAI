@@ -4,6 +4,7 @@ export interface User {
   email: string;
   birthDate?: string;
   profilePictureUrl?: string;
+  subscription_tier?: 'free' | 'pro';
 }
 
 export interface SkinProblem {
@@ -13,11 +14,27 @@ export interface SkinProblem {
   recommendation: string;
 }
 
+export interface RoutineStep {
+  paso: string;
+  ingrediente_key: string;
+  explicacion: string;
+}
+
 export interface AnalysisResult {
-  skinType: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive';
-  overallScore: number;
-  problems: SkinProblem[];
-  keyRecommendations: string[];
+  analisis: {
+    tipo_piel: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive';
+    edad_aparente: number;
+    puntuacion: number;
+    caracteristicas: string[];
+    analisis_general?: string;
+  };
+  mensaje_motivador: string;
+  rutina: {
+    manana: RoutineStep[];
+    noche: RoutineStep[];
+  };
+  problems?: SkinProblem[];
+  affiliateProducts?: any[];
 }
 
 export interface DailyRoutineStep {
@@ -55,3 +72,5 @@ export interface Notification {
   message: string;
   type: NotificationType;
 }
+
+export type SubscriptionTier = 'free' | 'pro';

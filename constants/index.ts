@@ -9,6 +9,7 @@ export const NAV_LINKS = [
   { name: 'Perfil', path: '/profile', icon: 'iconoir-user' },
   { name: 'Recomendaciones', path: '/recommendations', icon: 'iconoir-shopping-bag' },
   { name: 'Suscripción', path: '/subscription', icon: 'iconoir-star' },
+  { name: 'Términos de Uso', path: '/terminos', icon: 'iconoir-page' },
 ];
 
 export const MOCK_ROUTINE: DailyRoutineStep[] = [
@@ -35,13 +36,29 @@ export const MOCK_HISTORY: HistoryEntry[] = [
     date: '2023-10-26T10:00:00Z',
     imageUrl: 'https://picsum.photos/seed/face1/200/200',
     analysis: {
-      skinType: 'combination',
-      overallScore: 82,
+      analisis: {
+        tipo_piel: 'combination',
+        puntuacion: 82,
+        edad_aparente: 28,
+        caracteristicas: ['Mantén la hidratación en las mejillas.', 'Controla el sebo en la zona T.', 'Usa protector solar a diario.'],
+      },
+      mensaje_motivador: '¡Vas por buen camino! Tu piel mixta está bajo control.',
       problems: [
         { area: 'Nariz', issue: 'Puntos negros', severity: 'low', recommendation: 'Usa un exfoliante con ácido salicílico 2 veces por semana.' },
         { area: 'Frente', issue: 'Brillo', severity: 'medium', recommendation: 'Aplica una hidratante matificante por la mañana.' },
       ],
-      keyRecommendations: ['Mantén la hidratación en las mejillas.', 'Controla el sebo en la zona T.', 'Usa protector solar a diario.'],
+      rutina: {
+        manana: [
+          { paso: 'Limpieza', ingrediente_key: 'limpiador_gel', explicacion: 'Lava tu cara con un limpiador en gel para zona T.' },
+          { paso: 'Tónico', ingrediente_key: 'tonico', explicacion: 'Aplica un tónico sin alcohol.' },
+          { paso: 'Hidratación', ingrediente_key: 'hidratante_ligera', explicacion: 'Usa una hidratante no comedogénica con SPF 30.' }
+        ],
+        noche: [
+          { paso: 'Doble Limpieza', ingrediente_key: 'aceite_limpiador', explicacion: 'Usa aceite limpiador seguido de tu limpiador en gel.' },
+          { paso: 'Tratamiento', ingrediente_key: 'exfoliante_bha', explicacion: 'Aplica exfoliante con ácido salicílico en la nariz (3 veces/semana).' },
+          { paso: 'Hidratación', ingrediente_key: 'crema_hidratante', explicacion: 'Usa una crema hidratante en las zonas secas.' }
+        ]
+      }
     },
     routine: [
       { id: 'h1m1', time: 'morning', productType: 'Limpiador en Gel', instructions: 'Lava tu cara con un limpiador en gel para zona T.', completed: false },
@@ -57,13 +74,29 @@ export const MOCK_HISTORY: HistoryEntry[] = [
     date: '2023-09-15T11:30:00Z',
     imageUrl: 'https://picsum.photos/seed/face2/200/200',
     analysis: {
-      skinType: 'dry',
-      overallScore: 75,
+      analisis: {
+        tipo_piel: 'dry',
+        puntuacion: 75,
+        edad_aparente: 30,
+        caracteristicas: ['Hidratación intensiva es clave.', 'Evita limpiadores agresivos.', 'Introduce un aceite facial por la noche.'],
+      },
+      mensaje_motivador: 'Tu piel necesita un extra de amor e hidratación.',
       problems: [
         { area: 'Mejillas', issue: 'Enrojecimiento', severity: 'medium', recommendation: 'Usa productos calmantes con centella asiática.' },
         { area: 'Contorno de ojos', issue: 'Líneas finas', severity: 'low', recommendation: 'Aplica una crema de ojos con ácido hialurónico.' },
       ],
-      keyRecommendations: ['Hidratación intensiva es clave.', 'Evita limpiadores agresivos.', 'Introduce un aceite facial por la noche.'],
+      rutina: {
+        manana: [
+          { paso: 'Limpieza', ingrediente_key: 'limpiador_cremoso', explicacion: 'Limpia suavemente con un limpiador hidratante.' },
+          { paso: 'Tratamiento', ingrediente_key: 'esencia_hidratante', explicacion: 'Aplica una esencia con ácido hialurónico.' },
+          { paso: 'Hidratación', ingrediente_key: 'crema_rica', explicacion: 'Usa una crema rica con ceramidas y SPF 50.' }
+        ],
+        noche: [
+          { paso: 'Limpieza', ingrediente_key: 'balsamo_limpiador', explicacion: 'Derrite el maquillaje y las impurezas.' },
+          { paso: 'Tratamiento', ingrediente_key: 'serum_calmante', explicacion: 'Aplica un sérum con centella asiática para el enrojecimiento.' },
+          { paso: 'Nutrición', ingrediente_key: 'aceite_facial', explicacion: 'Sella la hidratación con 2-3 gotas de aceite facial.' }
+        ]
+      }
     },
     routine: [
       { id: 'h2m1', time: 'morning', productType: 'Limpiador Cremoso', instructions: 'Limpia suavemente con un limpiador hidratante.', completed: false },

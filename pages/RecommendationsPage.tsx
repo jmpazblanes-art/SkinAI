@@ -1,236 +1,230 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { AnalysisResult, ProductRecommendation } from '../types';
+import React, { useState, useEffect } from 'react';
 import Card from '../components/ui/Card';
 import { useAnalysis } from '../context/AnalysisContext';
 import RecommendationsSkeleton from './components/RecommendationsSkeleton';
 import LazyImage from '../components/ui/LazyImage';
-import { MOCK_RECOMMENDATIONS } from '../constants';
+import { getAffiliateProducts, AffiliateProduct } from '../services/supabaseService';
+import { useNotification } from '../context/NotificationContext';
 
-
-// --- AI SIMULATION LOGIC ---
-
-// A simple keyword-based scoring system to simulate AI recommendations
-const generateScores = (analysis: AnalysisResult, products: ProductRecommendation[]): (ProductRecommendation & { score: number; reason: string })[] => {
-    return products.map(product => {
-        let score = 0;
-        let reasons: string[] = [];
-        const productText = `${product.name} ${product.description}`.toLowerCase();
-
-        // Score based on skin type
-        switch (analysis.skinType) {
-            case 'oily':
-                if (productText.includes('gel') || productText.includes('ligera') || productText.includes('control de sebo') || productText.includes('matificante')) {
-                    score += 20;
-                    reasons.push('Ideal para piel grasa.');
-                }
-                break;
-            case 'dry':
-                if (productText.includes('cremoso') || productText.includes('rica') || productText.includes('hidratante') || productText.includes('ceramidas')) {
-                    score += 20;
-                    reasons.push('Perfecto para piel seca.');
-                }
-                break;
-            case 'combination':
-                 if (productText.includes('equilibrante') || productText.includes('suave')) {
-                    score += 15;
-                    reasons.push('Bueno para piel mixta.');
-                }
-                break;
-            case 'sensitive':
-                if (productText.includes('sensible') || productText.includes('calmante') || productText.includes('suave')) {
-                    score += 25;
-                    reasons.push('Recomendado para piel sensible.');
-                }
-                break;
-        }
-        
-        // Score based on problems
-        analysis.problems.forEach(problem => {
-            const issue = problem.issue.toLowerCase();
-            if ((issue.includes('acné') || issue.includes('puntos negros') || issue.includes('congestión')) && (productText.includes('salicílico') || productText.includes('niacinamida') || productText.includes('congestión'))) {
-                score += 30;
-                reasons.push('Ayuda a combatir el acné.');
-            }
-            if ((issue.includes('manchas')) && (productText.includes('niacinamida') || productText.includes('vitamina c') || productText.includes('glicólico'))) {
-                score += 25;
-                reasons.push('Eficaz contra las manchas.');
-            }
-            if ((issue.includes('arrugas') || issue.includes('líneas finas')) && (productText.includes('retinol') || productText.includes('hialurónico'))) {
-                score += 25;
-                reasons.push('Combate líneas finas.');
-            }
-             if ((issue.includes('enrojecimiento')) && (productText.includes('calmante') || productText.includes('centella'))) {
-                score += 30;
-                reasons.push('Calma el enrojecimiento.');
-            }
-        });
-
-        if (product.productType.toLowerCase().includes('protector solar')) {
-            score += 15;
-            reasons.push('Protección solar esencial.');
-        }
-
-        if (reasons.length === 0) {
-            reasons.push('Una buena opción general.');
-        }
-
-        return { ...product, score, reason: Array.from(new Set(reasons)).slice(0, 1).join(' ') };
-    });
-};
-
-const generateProductRecommendations = async (analysis: AnalysisResult): Promise<ProductRecommendation[]> => {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
-    const allProducts = MOCK_RECOMMENDATIONS;
-    const scoredProducts = generateScores(analysis, allProducts);
-    return scoredProducts.sort((a, b) => b.score - a.score).slice(0, 8);
-};
-
-
-// --- COMPONENT ---
+/**
+ * RecommendationsPage
+ *
+ * Esta página muestra las recomendaciones de productos basadas en los ingredientes
+ * de la rutina generada.
+ */
 
 const RecommendationsPage = () => {
-    const { latestAnalysis } = useAnalysis();
-    const [displayedRecommendations, setDisplayedRecommendations] = useState<ProductRecommendation[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    
-    const [filters, setFilters] = useState({
-        productType: 'all',
-        brand: 'all',
-        maxPrice: 100
-    });
-    
-    useEffect(() => {
-        const fetchRecommendations = async () => {
-            setIsLoading(true);
-            if (latestAnalysis?.result) {
-                const personalizedRecs = await generateProductRecommendations(latestAnalysis.result);
-                setDisplayedRecommendations(personalizedRecs);
-            } else {
-                setDisplayedRecommendations(MOCK_RECOMMENDATIONS);
-            }
-            setIsLoading(false);
-        };
-        fetchRecommendations();
-    }, [latestAnalysis]);
+  const { latestAnalysis } = useAnalysis();
+  const { addNotification } = useNotification();
+  const [products, setProducts] = useState<AffiliateProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-        const { name, value } = e.target;
-        // Fix: Ensure maxPrice is stored as a number, not a string from the input.
-        setFilters(prev => ({...prev, [name]: name === 'maxPrice' ? Number(value) : value}));
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      if (!latestAnalysis?.result) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        // Extract ingredient keys from routine
+        const morningKeys = latestAnalysis.result.rutina.manana.map(step => step.ingrediente_key);
+        const eveningKeys = latestAnalysis.result.rutina.noche.map(step => step.ingrediente_key);
+        const allKeys = Array.from(new Set([...morningKeys, ...eveningKeys])).filter(Boolean);
+
+        if (allKeys.length === 0) {
+          setProducts([]);
+          setIsLoading(false);
+          return;
+        }
+
+        const fetchedProducts = await getAffiliateProducts(allKeys);
+        setProducts(fetchedProducts);
+        setIsLoading(false);
+
+      } catch (err: any) {
+        console.error('Error al obtener productos:', err);
+        setError(err.message || 'Error al cargar productos');
+        addNotification('Error al cargar productos', 'error');
+        setIsLoading(false);
+      }
     };
 
-    const filteredRecommendations = useMemo(() => {
-        return displayedRecommendations.filter(p => {
-            const typeMatch = filters.productType === 'all' || p.productType === filters.productType;
-            // Fix: Ensured comparison is correct to avoid potential scope/typo issues.
-            const brandMatch = filters.brand === 'all' || p.brand === filters.brand;
-            const priceMatch = p.price <= filters.maxPrice;
-            return typeMatch && brandMatch && priceMatch;
-        });
-    }, [displayedRecommendations, filters]);
-    
-    // Fix: Using `...new Set()` is a common and idiomatic way to get unique values from an array. This should resolve type inference issues.
-    // Fix: Explicitly provide generic type to Set to avoid `unknown` type when spreading.
-    const uniqueTypes: string[] = ['all', ...new Set<string>(displayedRecommendations.map(p => p.productType))];
-    // Fix: Explicitly provide generic type to Set to avoid `unknown` type when spreading.
-    const uniqueBrands: string[] = ['all', ...new Set<string>(displayedRecommendations.map(p => p.brand))];
+    fetchProducts();
+  }, [latestAnalysis, addNotification]);
 
+  const categories = [
+    { id: 'limpiador', title: 'Limpiadores', keywords: ['limpiador', 'micellar', 'gel', 'espumoso'] },
+    { id: 'serum', title: 'Serums y Tratamientos', keywords: ['serum', 'vitamin_c', 'retinol', 'effaclar', 'acid'] },
+    { id: 'hidratante', title: 'Hidratantes', keywords: ['hidratante', 'crema', 'lotion', 'gel de agua', 'skin food', 'hydra'] },
+    { id: 'protector_solar', title: 'Protección Solar', keywords: ['spf', 'sun', 'fotoprotector', 'heliocare'] }
+  ];
+
+  const getProductsByCategory = (categoryKeywords: string[]) => {
+    return products.filter(product => {
+      const name = product.product_name.toLowerCase();
+      const key = product.ingredient_key.toLowerCase();
+      // Special case for SPF to avoid mixing with moisturizers that have SPF if we want strict separation, 
+      // but usually "SPF" keyword is enough.
+      // We process categories in order.
+      return categoryKeywords.some(keyword => name.includes(keyword) || key.includes(keyword));
+    });
+  };
+
+  // Helper to deduplicate products if they appear in multiple categories (optional, but good for UI)
+  // For now, we'll just let them appear where they match.
+
+  if (isLoading) {
     return (
-        <div>
-            <h1 className="text-3xl font-bold text-base-content mb-2">Recomendaciones de Productos</h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-                {latestAnalysis 
-                    ? `Basado en tu último análisis de piel (${latestAnalysis.result.skinType}), aquí tienes algunos productos recomendados.`
-                    : 'Estos son nuestros productos más populares. ¡Realiza un análisis para obtener recomendaciones personalizadas!'
-                }
-            </p>
-
-            <Card className="mb-6">
-                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
-                    <div>
-                        <label htmlFor="productType" className="block text-sm font-medium text-base-content mb-1">Tipo de producto</label>
-                        <div className="relative">
-                            <select 
-                                id="productType" 
-                                name="productType" 
-                                onChange={handleFilterChange} 
-                                value={filters.productType} 
-                                className="appearance-none block w-full bg-base-100 px-4 py-2 pr-10 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-transparent sm:text-sm transition-colors duration-150"
-                            >
-                                {uniqueTypes.map(type => <option key={type} value={type}>{type}</option>)}
-                            </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-                                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                     <div>
-                        <label htmlFor="brand" className="block text-sm font-medium text-base-content mb-1">Marca</label>
-                        <div className="relative">
-                            <select 
-                                id="brand" 
-                                name="brand" 
-                                onChange={handleFilterChange} 
-                                value={filters.brand} 
-                                className="appearance-none block w-full bg-base-100 px-4 py-2 pr-10 border border-base-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-transparent sm:text-sm transition-colors duration-150"
-                            >
-                                {uniqueBrands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
-                            </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-                                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                     <div>
-                        <label htmlFor="maxPrice" className="block text-sm font-medium text-base-content">Precio máximo: {filters.maxPrice}€</label>
-                        <input type="range" id="maxPrice" name="maxPrice" min="0" max="100" value={filters.maxPrice} onChange={handleFilterChange} className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer mt-2 accent-primary"/>
-                    </div>
-                </div>
-            </Card>
-
-            {isLoading ? <RecommendationsSkeleton count={6} /> : (
-                <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredRecommendations.map(product => (
-                        <Card key={product.id} className="p-0 flex flex-col relative overflow-hidden">
-                            {product.reason && latestAnalysis && (
-                                <div className="absolute top-2 left-2 z-10 bg-primary text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center animate-fade-in-fast">
-                                    <i className="iconoir-sparkle mr-1"></i>
-                                    {product.reason}
-                                </div>
-                            )}
-                            <LazyImage src={product.imageUrl} alt={product.name} className="w-full h-40 object-cover rounded-t-xl"/>
-                            <div className="p-4 flex flex-col flex-grow">
-                                <h3 className="text-lg font-bold text-base-content">{product.name}</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">{product.brand}</p>
-                                <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 flex-grow">{product.description}</p>
-                                <div className="flex justify-between items-center mt-4">
-                                    <p className="text-lg font-semibold text-primary">{product.price.toFixed(2)}€</p>
-                                    <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-sm font-semibold text-white bg-secondary rounded-md shadow-sm hover:bg-primary-focus transition-transform duration-200 hover:-translate-y-0.5">
-                                        Comprar
-                                    </a>
-                                </div>
-                            </div>
-                        </Card>
-                    ))}
-                </div>
-                {filteredRecommendations.length === 0 && (
-                     <Card>
-                        <div className="text-center py-12 text-gray-500">
-                             <i className="iconoir-search text-4xl mb-3"></i>
-                            <p className="font-semibold">No se encontraron productos.</p>
-                             <p>Prueba a ajustar los filtros para ver más resultados.</p>
-                        </div>
-                    </Card>
-                )}
-                </>
-            )}
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold text-base-content mb-2">Recomendaciones de Productos</h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
+          Buscando los mejores productos para tu rutina...
+        </p>
+        <RecommendationsSkeleton count={6} />
+      </div>
     );
+  }
+
+  if (!latestAnalysis?.result) {
+    return (
+      <div>
+        <h1 className="text-3xl font-bold text-base-content mb-2">Recomendaciones de Productos</h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
+          Realiza un análisis de piel para obtener recomendaciones personalizadas.
+        </p>
+        <Card>
+          <div className="text-center py-12">
+            <i className="iconoir-face-id text-6xl text-gray-400 mb-4"></i>
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              No hay análisis previo
+            </p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Ve a la página principal para realizar tu primer análisis facial.
+            </p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <h1 className="text-3xl font-bold text-base-content mb-2">Recomendaciones de Productos</h1>
+        <Card className="border-red-200 dark:border-red-800">
+          <div className="text-center py-12">
+            <i className="iconoir-warning-circle text-6xl text-red-500 mb-4"></i>
+            <p className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">
+              Error al cargar recomendaciones
+            </p>
+            <p className="text-gray-600 dark:text-gray-400">{error}</p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div>
+        <h1 className="text-3xl font-bold text-base-content mb-2">Recomendaciones de Productos</h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
+          Basado en tu último análisis de piel ({latestAnalysis.result.skinType})
+        </p>
+        <Card>
+          <div className="text-center py-12">
+            <i className="iconoir-shopping-bag text-6xl text-gray-400 mb-4"></i>
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              No se encontraron productos específicos
+            </p>
+            <p className="text-gray-600 dark:text-gray-400">
+              No hemos encontrado productos afiliados exactos para los ingredientes de tu rutina,
+              pero puedes buscar productos con los ingredientes sugeridos en tu farmacia o tienda de confianza.
+            </p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto pb-12">
+      <h1 className="text-3xl font-bold text-base-content mb-2">Productos sugeridos</h1>
+      <p className="text-gray-600 dark:text-gray-400 mb-8">
+        Selección de productos basada en los ingredientes clave de tu rutina ({latestAnalysis.result.skinType}).
+      </p>
+
+      <div className="space-y-12">
+        {categories.map((category) => {
+          const categoryProducts = getProductsByCategory(category.keywords);
+
+          if (categoryProducts.length === 0) return null;
+
+          return (
+            <div key={category.id} className="animate-fade-in">
+              <h2 className="text-2xl font-bold text-base-content mb-6 flex items-center">
+                <span className="bg-primary/10 p-2 rounded-lg mr-3 text-primary">
+                  {category.id === 'limpiador' && <i className="iconoir-droplet"></i>}
+                  {category.id === 'serum' && <i className="iconoir-flask"></i>}
+                  {category.id === 'hidratante' && <i className="iconoir-half-moon"></i>}
+                  {category.id === 'protector_solar' && <i className="iconoir-sun-light"></i>}
+                </span>
+                {category.title}
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {categoryProducts.map(product => (
+                  <Card key={product.id} className="p-0 flex flex-col relative overflow-hidden hover:shadow-lg transition-shadow bg-slate-800 border-slate-700">
+                    <div className="p-5 flex flex-col flex-grow">
+                      <div className="mb-2">
+                        <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${product.price_tier === 'budget' ? 'bg-green-900/50 text-green-400' :
+                          product.price_tier === 'premium' ? 'bg-purple-900/50 text-purple-400' :
+                            'bg-blue-900/50 text-blue-400'
+                          }`}>
+                          {product.price_tier === 'budget' ? 'Económico' :
+                            product.price_tier === 'premium' ? 'Premium' : 'Calidad/Precio'}
+                        </span>
+                      </div>
+
+                      <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 min-h-[3.5rem]">
+                        {product.product_name}
+                      </h3>
+
+                      <div className="mt-auto pt-4 border-t border-slate-700">
+                        <a
+                          href={product.affiliate_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full px-4 py-3 text-sm font-bold text-white bg-cyan-600 rounded-lg shadow-lg hover:bg-cyan-500 transition-all duration-200 hover:-translate-y-0.5 text-center"
+                        >
+                          Ver en Amazon <i className="iconoir-arrow-right ml-1"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <Card className="mt-12 bg-slate-800 border-slate-700">
+        <div className="text-center">
+          <i className="iconoir-info-circle text-3xl text-cyan-500 mb-2"></i>
+          <p className="text-sm text-gray-400">
+            Estos productos contienen los ingredientes recomendados en tu rutina.
+            Los enlaces son de afiliados, lo que nos ayuda a mantener SkinAI.
+          </p>
+        </div>
+      </Card>
+    </div>
+  );
 };
 
 export default RecommendationsPage;

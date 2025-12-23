@@ -1,12 +1,14 @@
 {
-  "name": "skinity",
+  "name": "skinai",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "validate-env": "node validate-env.cjs",
+    "check": "npm run validate-env && tsc --noEmit"
   },
   "dependencies": {
     "@google/genai": "^1.25.0",

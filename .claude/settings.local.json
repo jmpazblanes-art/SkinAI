@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run validate-env:*)",
+      "Bash(npx tsc:*)",
+      "Bash(nul)",
+      "Bash(mkdir:*)",
+      "Bash(npm run check:*)",
+      "Bash(if [ -f .env.local ])",
+      "Bash(then echo \"Archivo .env.local existe\")",
+      "Bash(else echo \"Archivo .env.local NO existe\")",
+      "Bash(fi)",
+      "Bash(findstr:*)",
+      "Bash(npm run validate-env:frontend:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

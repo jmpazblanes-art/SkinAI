@@ -4,10 +4,10 @@ import { AnalysisResult } from '../types';
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 if (!API_KEY) {
-  console.error("API_KEY environment variable is not set.");
+  throw new Error("VITE_GEMINI_API_KEY environment variable is not set. Please check your .env.local file.");
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY! });
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 const analysisSchema = {
   type: Type.OBJECT,
@@ -71,7 +71,10 @@ export const analyzeSkin = async (base64Image: string): Promise<AnalysisResult> 
     return JSON.parse(jsonText) as AnalysisResult;
 
   } catch (error: any) {
-    console.error("Error analyzing skin with Gemini API:", error);
+    // Log error for debugging in development only
+    if (import.meta.env.DEV) {
+      console.error("Error analyzing skin with Gemini API:", error);
+    }
     const errorMessage = error.toString().toLowerCase();
 
     if (errorMessage.includes('safety')) {

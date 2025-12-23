@@ -17,8 +17,9 @@ const ScoreChart: React.FC<{ entries: HistoryEntry[] }> = ({ entries }) => {
     const maxScore = 100;
     const points = entries.map((entry, i) => {
         const x = entries.length > 1 ? (i / (entries.length - 1)) * 100 : 50;
-        const y = 100 - (entry.analysis.overallScore / maxScore) * 100;
-        return { x, y, score: entry.analysis.overallScore, date: new Date(entry.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) };
+        const score = entry.analysis.overallScore || 0;
+        const y = 100 - (score / maxScore) * 100;
+        return { x, y, score, date: new Date(entry.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) };
     });
 
     const linePoints = points.map(p => `${p.x},${p.y}`).join(' ');
@@ -76,7 +77,7 @@ const ScoreChart: React.FC<{ entries: HistoryEntry[] }> = ({ entries }) => {
             </div>
 
             {activePoint && (
-                 <div className="absolute top-0 left-0 w-full h-full pointer-events-none" style={{ transform: 'translateZ(0)' }}>
+                <div className="absolute top-0 left-0 w-full h-full pointer-events-none" style={{ transform: 'translateZ(0)' }}>
                     <div
                         className="absolute top-0 bottom-0 w-px bg-primary/30"
                         style={{ left: `${activePoint.x}%` }}
@@ -102,7 +103,7 @@ const ScoreChart: React.FC<{ entries: HistoryEntry[] }> = ({ entries }) => {
                     </div>
                 </div>
             )}
-             <div className="absolute -bottom-5 left-0 right-0 flex justify-between text-xs text-gray-400">
+            <div className="absolute -bottom-5 left-0 right-0 flex justify-between text-xs text-gray-400">
                 <span>{startDate}</span>
                 <span>{endDate}</span>
             </div>
@@ -115,14 +116,14 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({ history }) => {
 
     const latestEntry = history[0];
     const scoreHistoryEntries = history.slice(0, 5).reverse();
-    
-    const scoreChange = scoreHistoryEntries.length > 1 
-        ? scoreHistoryEntries[scoreHistoryEntries.length - 1].analysis.overallScore - scoreHistoryEntries[scoreHistoryEntries.length - 2].analysis.overallScore 
+
+    const scoreChange = scoreHistoryEntries.length > 1
+        ? scoreHistoryEntries[scoreHistoryEntries.length - 1].analysis.overallScore - scoreHistoryEntries[scoreHistoryEntries.length - 2].analysis.overallScore
         : 0;
-        
+
     const scoreChangeColor = scoreChange > 0 ? 'text-primary' : scoreChange < 0 ? 'text-red-500' : 'text-gray-500';
     const scoreChangeIcon = scoreChange > 0 ? '▲' : scoreChange < 0 ? '▼' : '▬';
-    
+
     return (
         <Card>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
@@ -131,17 +132,17 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({ history }) => {
                     <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{new Date(latestEntry.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     <div className="flex items-center justify-center md:justify-start gap-4">
                         <p className="text-5xl font-bold text-primary">{latestEntry.analysis.overallScore}</p>
-                         {scoreHistoryEntries.length > 1 && (
+                        {scoreHistoryEntries.length > 1 && (
                             <span className={`text-lg font-semibold ${scoreChangeColor}`}>
                                 {scoreChangeIcon} {Math.abs(scoreChange)}
                             </span>
                         )}
                     </div>
                 </div>
-                 <div className="md:col-span-2 pb-6">
+                <div className="md:col-span-2 pb-6">
                     <h3 className="text-lg font-semibold text-base-content mb-2 text-center md:text-left">Progreso de Puntuación</h3>
                     <div className="h-32 text-primary">
-                       <ScoreChart entries={scoreHistoryEntries} />
+                        <ScoreChart entries={scoreHistoryEntries} />
                     </div>
                 </div>
             </div>

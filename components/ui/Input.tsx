@@ -13,7 +13,7 @@ const Input: React.FC<InputProps> = ({ label, id, ...props }) => {
       </label>
       <input
         id={id}
-        className="block w-full px-4 py-2 border border-base-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-transparent sm:text-sm transition-colors duration-150"
+        className="block w-full px-4 py-2 border border-base-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-focus focus:border-transparent sm:text-sm transition-colors duration-150 bg-white dark:bg-neutral-800 text-gray-900 dark:text-gray-100"
         {...props}
       />
     </div>

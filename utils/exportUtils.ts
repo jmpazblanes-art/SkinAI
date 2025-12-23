@@ -15,13 +15,13 @@ export const exportToCSV = (data: HistoryEntry[], filename: string = 'historial-
   const headers = ['Fecha', 'Tipo de Piel', 'Puntuación General', 'Problemas Detectados'];
   const rows = data.map(entry => [
     new Date(entry.date).toLocaleString(),
-    entry.analysis.skinType,
-    entry.analysis.overallScore,
-    entry.analysis.problems.map(p => `${p.issue} (${p.severity})`).join('; ')
+    entry.analysis.analisis.tipo_piel,
+    entry.analysis.analisis.puntuacion,
+    (entry.analysis.problems || []).map(p => `${p.issue} (${p.severity})`).join('; ')
   ]);
 
-  let csvContent = "data:text/csv;charset=utf-t8," 
-    + headers.join(",") + "\n" 
+  let csvContent = "data:text/csv;charset=utf-t8,"
+    + headers.join(",") + "\n"
     + rows.map(e => e.join(",")).join("\n");
 
   const encodedUri = encodeURI(csvContent);
@@ -38,7 +38,7 @@ export const exportToPDF = (data: HistoryEntry[], filename: string = 'historial-
   if (data.length === 0) return;
 
   const doc = new jsPDF() as jsPDFWithAutoTable;
-  
+
   // Fix: Property 'text' does not exist on type 'jsPDFWithAutoTable'. This is now fixed by using a type intersection.
   doc.text("Historial de Análisis de Piel", 14, 20);
 
@@ -48,9 +48,9 @@ export const exportToPDF = (data: HistoryEntry[], filename: string = 'historial-
   data.forEach(entry => {
     const row = [
       new Date(entry.date).toLocaleDateString(),
-      entry.analysis.skinType,
-      entry.analysis.overallScore,
-      entry.analysis.problems.map(p => p.issue).join(', ')
+      entry.analysis.analisis.tipo_piel,
+      entry.analysis.analisis.puntuacion,
+      (entry.analysis.problems || []).map(p => p.issue).join(', ')
     ];
     tableRows.push(row);
   });
