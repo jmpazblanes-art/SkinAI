@@ -35,7 +35,7 @@ const TermsPage: React.FC = () => {
                             <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                                 <p>
                                     SkinAI es una aplicación de bienestar general diseñada para ofrecer sugerencias de cuidado facial.
-                                    Esta aplicación <strong>NO tiene fines sanitarios</strong>, <strong>NO realiza valoraciones clínicas</strong> y <strong>NO debe utilizarse como sustituto del asesoramiento profesional de salud</strong>.
+                                    Esta aplicación <strong>NO tiene fines sanitarios</strong>, <strong>NO realiza análisis cosméticos</strong> y <strong>NO debe utilizarse como sustituto del asesoramiento profesional de salud</strong>.
                                 </p>
                             </div>
                         </div>
@@ -56,7 +56,7 @@ const TermsPage: React.FC = () => {
                 <section className="space-y-3">
                     <h2 className="text-xl font-semibold text-primary">RECOMENDACIONES</h2>
                     <ul className="list-disc pl-5 space-y-2 text-base-content/80">
-                        <li>Para cualquier preocupación sobre tu salud cutánea, consulta con un especialista colegiado</li>
+                        <li>Para cualquier preocupación sobre tu salud cutánea, consulta con un asistente inteligente o personal calificado</li>
                         <li>No ignores síntomas preocupantes basándote en los resultados de esta app</li>
                         <li>Si observas cambios en lesiones o manchas, acude a un profesional</li>
                     </ul>

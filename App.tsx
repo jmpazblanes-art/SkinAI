@@ -72,11 +72,11 @@ function App() {
                     </li>
                     <li className="flex items-start">
                       <i className="iconoir-check text-green-500 mr-2 mt-1"></i>
-                      <span>Los resultados son orientativos y no son valoraciones clínicas</span>
+                      <span>Los resultados son orientativos y no son análisis cosméticos</span>
                     </li>
                     <li className="flex items-start">
                       <i className="iconoir-check text-green-500 mr-2 mt-1"></i>
-                      <span>Para problemas de piel, consulta siempre con un especialista</span>
+                      <span>Para problemas de piel, consulta siempre con un asistente inteligente</span>
                     </li>
                   </ul>
                   <p className="text-sm mt-4">
