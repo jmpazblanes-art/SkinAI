@@ -7,6 +7,7 @@ export const NAV_LINKS = [
   { name: 'Consejos', path: '/tips', icon: 'iconoir-light-bulb-on' },
   { name: 'Ayuda y Opiniones', path: '/feedback', icon: 'iconoir-chat-bubble-question' },
   { name: 'Perfil', path: '/profile', icon: 'iconoir-user' },
+  { name: 'Skin Coach IA', path: '/chat', icon: 'iconoir-chat-bubble-check' },
   { name: 'Recomendaciones', path: '/recommendations', icon: 'iconoir-shopping-bag' },
   { name: 'Suscripción', path: '/subscription', icon: 'iconoir-star' },
   { name: 'Términos de Uso', path: '/terminos', icon: 'iconoir-page' },

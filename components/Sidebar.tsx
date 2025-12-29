@@ -50,16 +50,20 @@ const Sidebar: React.FC = () => {
         </div>
 
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-          {NAV_LINKS.map((link) => (
-            <NavLink
-              key={link.name}
-              to={link.path}
-              className={linkClasses(link.path)}
-            >
-              <i className={`${link.icon} h-5 w-5 mr-3`}></i>
-              {link.name}
-            </NavLink>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const isChatProtected = link.path === '/chat' && user?.subscription_tier !== 'pro';
+            return (
+              <NavLink
+                key={link.name}
+                to={link.path}
+                className={`${linkClasses(link.path)} ${isChatProtected ? 'opacity-70' : ''}`}
+              >
+                <i className={`${link.icon} h-5 w-5 mr-3`}></i>
+                <span className="flex-grow">{link.name}</span>
+                {isChatProtected && <i className="iconoir-lock h-3.5 w-3.5 ml-2 text-primary/60"></i>}
+              </NavLink>
+            );
+          })}
         </nav>
 
         <div className="p-4 border-t border-base-300/60 space-y-4">

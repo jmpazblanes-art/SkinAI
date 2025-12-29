@@ -34,8 +34,8 @@ const TermsPage: React.FC = () => {
                             <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">AVISO IMPORTANTE</h3>
                             <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                                 <p>
-                                    SkinAI es una aplicación de entretenimiento y bienestar general diseñada para ofrecer sugerencias de cuidado facial.
-                                    Esta aplicación <strong>NO es un dispositivo médico</strong>, <strong>NO realiza diagnósticos médicos</strong> y <strong>NO debe utilizarse como sustituto del consejo médico profesional</strong>.
+                                    SkinAI es una aplicación de bienestar general diseñada para ofrecer sugerencias de cuidado facial.
+                                    Esta aplicación <strong>NO tiene fines sanitarios</strong>, <strong>NO realiza valoraciones clínicas</strong> y <strong>NO debe utilizarse como sustituto del asesoramiento profesional de salud</strong>.
                                 </p>
                             </div>
                         </div>
@@ -47,17 +47,18 @@ const TermsPage: React.FC = () => {
                     <ul className="list-disc pl-5 space-y-2 text-base-content/80">
                         <li>Los análisis se basan en procesamiento de imágenes mediante inteligencia artificial</li>
                         <li>Los resultados son meramente orientativos y para fines de entretenimiento</li>
-                        <li>La aplicación no detecta, diagnostica ni trata enfermedades de la piel</li>
-                        <li>No somos profesionales médicos ni dermatólogos</li>
+                        <li>La aplicación no detecta ni analiza patologías cutáneas</li>
+                        <li>El servicio se limita a orientaciones de carácter cosmético</li>
+                        <li>No somos personal de salud clínico ni facultativos</li>
                     </ul>
                 </section>
 
                 <section className="space-y-3">
                     <h2 className="text-xl font-semibold text-primary">RECOMENDACIONES</h2>
                     <ul className="list-disc pl-5 space-y-2 text-base-content/80">
-                        <li>Para cualquier preocupación sobre tu salud cutánea, consulta con un dermatólogo</li>
+                        <li>Para cualquier preocupación sobre tu salud cutánea, consulta con un especialista colegiado</li>
                         <li>No ignores síntomas preocupantes basándote en los resultados de esta app</li>
-                        <li>Si observas cambios en lunares, lesiones o manchas, acude a un profesional</li>
+                        <li>Si observas cambios en lesiones o manchas, acude a un profesional</li>
                     </ul>
                 </section>
 

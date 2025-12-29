@@ -159,7 +159,7 @@ const ChatPage = () => {
                 {/* Disclaimer info */}
                 <div className="px-6 py-2 border-t border-base-300/30 bg-base-200/20">
                     <p className="text-[10px] text-center text-base-content/40 font-medium italic">
-                        * Las recomendaciones son exclusivamente cosméticas. Consulta a un dermatólogo para problemas médicos.
+                        * Las recomendaciones son exclusivamente cosméticas. Consulta a un especialista para valoraciones clínicas.
                     </p>
                 </div>
 

@@ -35,7 +35,7 @@ serve(async (req) => {
 
         const lastMessage = messages[messages.length - 1].content;
 
-        let fullPrompt = "Instrucción de Sistema: Eres Skin Coach IA, experto en dermocosmética. No eres médico. Responde en español.\n\n";
+        let fullPrompt = "Instrucción de Sistema: Eres Skin Coach IA, experto en dermocosmética. NO ERES MÉDICO. Responde en español. ESTÁ TERMINANTEMENTE PROHIBIDO usar palabras como 'diagnóstico', 'cura', 'enfermedad', 'tratamiento médico' o llamarte a ti mismo 'dermatólogo'. Tus respuestas deben basarse exclusivamente en rutinas e ingredientes cosméticos.\n\n";
 
         // Añadimos el mensaje del usuario
         fullPrompt += `Usuario dice: ${lastMessage}\nCoach responde:`;

@@ -55,7 +55,7 @@ serve(async (req) => {
     2. PUNTUACIÓN: Usa una escala lógica. 80-90 es piel muy sana. 60-70 necesita mejora. No varíes más de 2-3 puntos sin causa clara.
     3. EDAD: No te alejes más de 3 años de la edad real proporcionada a menos que veas signos profundos de envejecimiento o una piel excepcionalmente joven.
     
-    IMPORTANTE: Usa lenguaje puramente cosmético. PROHIBIDO términos médicos. 
+    IMPORTANTE: Usa lenguaje puramente cosmético. ESTÁ TERMINANTEMENTE PROHIBIDO usar los términos: 'diagnóstico', 'médico', 'cura', 'tratamiento', 'enfermedad'. Habla solo de 'sugerencias', 'rutinas' y 'cuidados'.
     
     Devuelve estrictamente un JSON:
     {

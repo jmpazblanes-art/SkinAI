@@ -213,7 +213,7 @@ const HomePage = () => {
         </div>
         <div className="mt-6 p-4 bg-slate-700/50 border-l-4 border-cyan-500 rounded-r-lg">
           <p className="text-sm text-base-content/90">
-            <strong>Nota:</strong> Esta herramienta ofrece sugerencias de cuidado facial basadas en inteligencia artificial. Los resultados son orientativos y no constituyen diagnóstico médico. Para cualquier preocupación sobre tu piel, consulta con un profesional de la salud.
+            <strong>Nota:</strong> Esta herramienta ofrece sugerencias de cuidado facial basadas en inteligencia artificial. Los resultados son orientativos y no constituyen asesoramiento profesional de salud. Para cualquier preocupación sobre tu piel, consulta con un profesional.
           </p>
         </div>
       </Card>
@@ -227,7 +227,7 @@ const HomePage = () => {
             imageUrl={latestAnalysis.imageUrl}
           />
           <p className="text-sm text-gray-500 text-center mt-6 px-4">
-            Esta herramienta ofrece sugerencias de cuidado facial basadas en análisis visual con IA. No constituye diagnóstico médico. Para problemas de piel persistentes, consulta con un dermatólogo.
+            Esta herramienta ofrece sugerencias de cuidado facial basadas en análisis visual con IA. No constituye asesoramiento profesional de salud. Para problemas de piel persistentes, consulta con un especialista.
           </p>
         </>
       )}
@@ -274,7 +274,7 @@ const HomePage = () => {
                     Iniciar Consulta
                   </Button>
                   <p className="text-[10px] text-base-content/50 italic">
-                    * Esta IA ofrece consejos cosméticos, no diagnósticos médicos.
+                    * Esta IA ofrece consejos cosméticos, no valoraciones clínicas.
                   </p>
                 </div>
               </div>

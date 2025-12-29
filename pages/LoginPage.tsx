@@ -166,7 +166,7 @@ const LoginPage = () => {
                 </div>
                 <div className="ml-3 text-sm">
                   <label htmlFor="terms" className="font-medium text-base-content/80">
-                    Entiendo que esta app ofrece sugerencias de cuidado estético y NO es consejo médico. Acepto los <a href="/terms" className="text-primary hover:text-primary-focus">Términos de Uso</a>.
+                    Entiendo que esta app ofrece sugerencias de cuidado estético y NO es asesoramiento profesional de salud. Acepto los <a href="/#/terms" className="text-primary hover:text-primary-focus">Términos de Uso</a>.
                   </label>
                 </div>
               </div>
