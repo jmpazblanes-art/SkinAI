@@ -14,6 +14,7 @@ import SuccessPage from './pages/SuccessPage';
 import CancelPage from './pages/CancelPage';
 import TermsPage from './pages/TermsPage';
 import ProgressPage from './pages/ProgressPage';
+import ChatPage from './pages/ChatPage';
 import { useAuth } from './hooks/useAuth';
 import { AnalysisProvider } from './context/AnalysisContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -40,7 +41,7 @@ function App() {
   // Show loading spinner while checking authentication status
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-900">
+      <div className="min-h-screen flex items-center justify-center bg-base-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">Cargando...</p>
@@ -104,6 +105,7 @@ function App() {
                 <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
                 <Route path="/recommendations" element={<PrivateRoute><RecommendationsPage /></PrivateRoute>} />
                 <Route path="/subscription" element={<PrivateRoute><SubscriptionPage /></PrivateRoute>} />
+                <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
                 <Route path="/terminos" element={<PrivateRoute><TermsPage /></PrivateRoute>} />
                 <Route path="/success" element={<SuccessPage />} />
                 <Route path="/cancel" element={<CancelPage />} />

@@ -33,14 +33,12 @@ const ReminderControl: React.FC<{
       />
       <button
         onClick={onToggle}
-        className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${
-          reminder.enabled ? 'bg-primary' : 'bg-gray-300'
-        }`}
+        className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${reminder.enabled ? 'bg-primary' : 'bg-gray-300'
+          }`}
       >
         <span
-          className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 ${
-            reminder.enabled ? 'translate-x-6' : 'translate-x-1'
-          }`}
+          className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 ${reminder.enabled ? 'translate-x-6' : 'translate-x-1'
+            }`}
         />
       </button>
     </div>
@@ -48,16 +46,29 @@ const ReminderControl: React.FC<{
 );
 
 const ProfilePage = () => {
-  const { user, updateProfilePicture } = useAuth();
+  const { user, updateProfilePicture, activateProCode } = useAuth();
   const { addNotification } = useNotification();
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [birthDate, setBirthDate] = useState(user?.birthDate || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [promoCode, setPromoCode] = useState('');
   const [reminders, setReminders] = useState({
     morning: { enabled: false, time: '08:00' },
     evening: { enabled: false, time: '21:00' },
   });
+
+  const handleActivateCode = async () => {
+    if (!promoCode) return;
+
+    const success = await activateProCode(promoCode);
+    if (success) {
+      addNotification('¡Felicidades! Has activado el modo PRO con éxito.', 'success');
+      setPromoCode('');
+    } else {
+      addNotification('Código no válido o ya activado.', 'error');
+    }
+  };
 
   useEffect(() => {
     // Load reminder settings from local storage
@@ -189,16 +200,35 @@ const ProfilePage = () => {
           </Card>
 
           <Card className="mt-8">
+            <h2 className="text-xl font-bold mb-2">Canjear Código</h2>
+            <p className="text-sm text-gray-500 mb-4">Si tienes un código de acceso o promoción, introdúcelo aquí para activar funciones especiales.</p>
+            <div className="flex gap-4">
+              <div className="flex-grow">
+                <Input
+                  label=""
+                  id="promo-code"
+                  placeholder="Introduce tu código"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                />
+              </div>
+              <div className="pt-1">
+                <Button variant="secondary" onClick={handleActivateCode}>Activar</Button>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="mt-8">
             <form onSubmit={handleChangePassword}>
-                <h2 className="text-xl font-bold mb-4">Seguridad</h2>
-                <div className="space-y-4">
-                    <Input label="Contraseña actual" id="current-password" type="password" />
-                    <Input label="Nueva contraseña" id="new-password" type="password" />
-                    <Input label="Confirmar nueva contraseña" id="confirm-password" type="password" />
-                </div>
-                <div className="pt-6">
-                    <Button type="submit">Cambiar Contraseña</Button>
-                </div>
+              <h2 className="text-xl font-bold mb-4">Seguridad</h2>
+              <div className="space-y-4">
+                <Input label="Contraseña actual" id="current-password" type="password" />
+                <Input label="Nueva contraseña" id="new-password" type="password" />
+                <Input label="Confirmar nueva contraseña" id="confirm-password" type="password" />
+              </div>
+              <div className="pt-6">
+                <Button type="submit">Cambiar Contraseña</Button>
+              </div>
             </form>
           </Card>
         </div>

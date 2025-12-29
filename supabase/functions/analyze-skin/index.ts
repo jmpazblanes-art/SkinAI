@@ -14,7 +14,7 @@ serve(async (req) => {
     }
 
     try {
-        const { image, user_id } = await req.json()
+        const { image, user_id, birth_date } = await req.json()
 
         if (!image) {
             return new Response(
@@ -23,33 +23,51 @@ serve(async (req) => {
             )
         }
 
+        // Calcular edad real si se proporciona birth_date
+        let ageContext = "";
+        if (birth_date) {
+            const birth = new Date(birth_date);
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const m = today.getMonth() - birth.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            ageContext = `El usuario tiene cronológicamente ${age} años. `;
+        }
+
         // Inicializar Gemini
         const genAI = new GoogleGenerativeAI(Deno.env.get('GOOGLE_API_KEY') || '')
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" })
+        const model = genAI.getGenerativeModel({
+            model: "gemini-flash-latest",
+            generationConfig: {
+                temperature: 0, // Fuerza resultados idénticos ante entradas similares
+                topP: 1,
+                topK: 1
+            }
+        })
 
-        const prompt = `Actúa como un experto en dermocosmética. Analiza la piel de la imagen. 
-    IMPORTANTE: Usa un lenguaje estrictamente cosmético. ESTÁ PROHIBIDO usar términos médicos, diagnósticos, 'curas' o 'tratamientos'. 
-    Solo sugiere 'rutinas', 'cuidados' y 'recomendaciones cosméticas'. 
+        const prompt = `Actúa como un analista experto y OBJETIVO en dermocosmética. Analiza la piel de la imagen. 
+    ${ageContext}
     
-    Devuelve estrictamente un JSON con el siguiente formato:
+    CRITERIOS DE CONSISTENCIA:
+    1. TIPO DE PIEL: Solo cambia de "normal" a "combination" si ves brillos claros en zona T. Sé conservador.
+    2. PUNTUACIÓN: Usa una escala lógica. 80-90 es piel muy sana. 60-70 necesita mejora. No varíes más de 2-3 puntos sin causa clara.
+    3. EDAD: No te alejes más de 3 años de la edad real proporcionada a menos que veas signos profundos de envejecimiento o una piel excepcionalmente joven.
+    
+    IMPORTANTE: Usa lenguaje puramente cosmético. PROHIBIDO términos médicos. 
+    
+    Devuelve estrictamente un JSON:
     {
       "tipo_piel": "oily | dry | combination | normal | sensitive",
-      "preocupaciones": ["brillos", "puntos negros", "textura irregular", etc],
-      "ingredientes_clave": ["niacinamida", "ácido hialurónico", "vitamina c"],
-      "mensaje_motivador": "un mensaje breve y positivo sobre el cuidado de la piel",
-      "rutina": {
-        "manana": [
-          {"paso": "Limpieza", "producto": "Limpiador suave", "ingrediente_key": "limpiador"},
-          {"paso": "Tratamiento", "producto": "Sérum de...", "ingrediente_key": "ingrediente_del_serum"}
-        ],
-        "noche": [
-          {"paso": "Limpieza", "producto": "Aceite limpiador", "ingrediente_key": "aceite"},
-          {"paso": "Hidratación", "producto": "Crema de...", "ingrediente_key": "ingrediente_de_la_crema"}
-        ]
-      }
+      "edad_aparente": número entre 18 y 90,
+      "puntuacion": número entre 1 y 100,
+      "preocupaciones": ["lista de 3-4 strings"],
+      "ingredientes_clave": ["lista de 3 strings"],
+      "mensaje_motivador": "string breve",
+      "rutina": { "manana": [...], "noche": [...] }
     }`
 
-        // Gemini espera la imagen en base64 sin el prefijo data:image/...
         const base64Data = image.split(',')[1] || image
 
         const result = await model.generateContent([
@@ -124,8 +142,8 @@ serve(async (req) => {
             analisis: {
                 tipo_piel: rawAnalysis.tipo_piel,
                 caracteristicas: rawAnalysis.preocupaciones,
-                edad_aparente: 25,
-                puntuacion: 85
+                edad_aparente: rawAnalysis.edad_aparente || 25,
+                puntuacion: rawAnalysis.puntuacion || 80
             },
             mensaje_motivador: rawAnalysis.mensaje_motivador,
             rutina: rawAnalysis.rutina,

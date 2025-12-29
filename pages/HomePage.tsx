@@ -100,7 +100,9 @@ const HomePage = () => {
     try {
       // Enviar imagen al webhook de N8N
       setMessage('Analizando tu piel con IA dermatológica...');
-      const webhookResponse = await callSkinAnalysisWebhook(user?.id || '', previewDataUrl);
+      const webhookResponse = await callSkinAnalysisWebhook(user?.id || '', previewDataUrl, {
+        birthDate: user?.birthDate
+      });
 
       console.log('📦 Respuesta completa del webhook:', webhookResponse);
 
@@ -261,15 +263,20 @@ const HomePage = () => {
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-base-100"></div>
               </div>
               <div className="flex-grow text-center md:text-left">
-                <h2 className="text-2xl font-bold text-base-content mb-2">Chat con Dermatólogo IA</h2>
+                <h2 className="text-2xl font-bold text-base-content mb-2">Tu Skin Coach IA</h2>
                 <p className="text-base-content/70 mb-4">
-                  ¿Tienes dudas sobre tu rutina? Consulta con nuestro asistente experto entrenado con miles de casos dermatológicos.
-                  Disponible 24/7 para suscriptores Pro.
+                  ¿Tienes dudas sobre tu rutina? Conversa con nuestro asistente experto en rutinas y cuidado facial.
+                  Consulta consejos cosméticos personalizados 24/7.
                 </p>
-                <Button className="w-full md:w-auto shadow-lg shadow-primary/20">
-                  <i className="iconoir-chat-lines mr-2"></i>
-                  Iniciar Consulta
-                </Button>
+                <div className="flex flex-col gap-3">
+                  <Button className="w-full md:w-auto shadow-lg shadow-primary/20" onClick={() => window.location.href = '/#/chat'}>
+                    <i className="iconoir-chat-lines mr-2"></i>
+                    Iniciar Consulta
+                  </Button>
+                  <p className="text-[10px] text-base-content/50 italic">
+                    * Esta IA ofrece consejos cosméticos, no diagnósticos médicos.
+                  </p>
+                </div>
               </div>
             </div>
           </Card>

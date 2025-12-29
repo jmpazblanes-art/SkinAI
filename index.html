@@ -1,92 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SkinAI</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              primary: 'var(--color-primary)',
-              'primary-focus': 'var(--color-primary-focus)',
-              secondary: 'var(--color-secondary)',
-              'base-100': 'var(--color-base-100)',
-              'base-200': 'var(--color-base-200)',
-              'base-300': 'var(--color-base-300)',
-              'base-content': 'var(--color-base-content)',
-              neutral: {
-                50: '#F8FAFC',
-                100: '#F1F5F9',
-                200: '#E2E8F0',
-                300: '#CBD5E1',
-                400: '#94A3B8',
-                500: '#64748B',
-                600: '#475569',
-                700: '#334155',
-                800: '#1E293B',
-                900: '#0F172A',
-              },
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkinAI - Tu Consultor Experto en Dermocosmética</title>
+  <meta name="description"
+    content="Analiza tu piel con IA, recibe rutinas personalizadas y consejos de expertos en dermocosmética con SkinAI." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: 'var(--color-primary)',
+            'primary-focus': 'var(--color-primary-focus)',
+            'primary-content': 'var(--color-primary-content)',
+            secondary: 'var(--color-secondary)',
+            'base-100': 'var(--color-base-100)',
+            'base-200': 'var(--color-base-200)',
+            'base-300': 'var(--color-base-300)',
+            'base-content': 'var(--color-base-content)',
+            neutral: {
+              50: '#F8FAFC',
+              100: '#F1F5F9',
+              200: '#E2E8F0',
+              300: '#CBD5E1',
+              400: '#94A3B8',
+              500: '#64748B',
+              600: '#475569',
+              700: '#334155',
+              800: '#1E293B',
+              900: '#0F172A',
             },
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-            },
-            keyframes: {
-              'fade-in-right': {
-                'from': { opacity: '0', transform: 'translateX(100%)' },
-                'to': { opacity: '1', transform: 'translateX(0)' },
-              },
-               'fade-in': {
-                'from': { opacity: '0' },
-                'to': { opacity: '1' },
-              },
-              'fade-out': {
-                'from': { opacity: '1' },
-                'to': { opacity: '0' },
-              },
-            },
-            animation: {
-              'fade-in-right': 'fade-in-right 0.3s ease-out forwards',
-              'fade-in': 'fade-in 0.3s ease-out forwards',
-              'fade-out': 'fade-out 0.3s ease-in forwards',
-            }
           },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          keyframes: {
+            'fade-in-right': {
+              'from': { opacity: '0', transform: 'translateX(100%)' },
+              'to': { opacity: '1', transform: 'translateX(0)' },
+            },
+            'fade-in': {
+              'from': { opacity: '0' },
+              'to': { opacity: '1' },
+            },
+            'fade-out': {
+              'from': { opacity: '1' },
+              'to': { opacity: '0' },
+            },
+          },
+          animation: {
+            'fade-in-right': 'fade-in-right 0.3s ease-out forwards',
+            'fade-in': 'fade-in 0.3s ease-out forwards',
+            'fade-out': 'fade-out 0.3s ease-in forwards',
+          }
         },
-      }
-    </script>
-    <style>
-      :root {
-        --color-primary: #3B82F6; /* blue-500 */
-        --color-primary-focus: #2563EB; /* blue-600 */
-        --color-secondary: #60A5FA; /* blue-400 */
-        --color-base-100: #F9FAFB; /* gray-50 */
-        --color-base-200: #F3F4F6; /* gray-100 */
-        --color-base-300: #E5E7EB; /* gray-200 */
-        --color-base-content: #1F2937; /* gray-800 */
-      }
-      .dark {
-        --color-primary: #60A5FA; /* blue-400 */
-        --color-primary-focus: #93C5FD; /* blue-300 */
-        --color-secondary: #38BDF8; /* sky-400 */
-        --color-base-100: #111827; /* gray-900 */
-        --color-base-200: #1F2937; /* gray-800 */
-        --color-base-300: #374151; /* gray-700 */
-        --color-base-content: #F3F4F6; /* gray-100 */
-      }
-      body {
-        font-family: 'Inter', sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-    </style>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css" />
+      },
+    }
+  </script>
+  <style>
+    :root {
+      --color-primary: #3B82F6;
+      /* blue-500 */
+      --color-primary-focus: #2563EB;
+      /* blue-600 */
+      --color-primary-content: #FFFFFF;
+      --color-secondary: #60A5FA;
+      /* blue-400 */
+      --color-base-100: #F9FAFB;
+      /* gray-50 */
+      --color-base-200: #F3F4F6;
+      /* gray-100 */
+      --color-base-300: #E5E7EB;
+      /* gray-200 */
+      --color-base-content: #1F2937;
+      /* gray-800 */
+    }
+
+    .dark {
+      --color-primary: #60A5FA;
+      /* blue-400 */
+      --color-primary-focus: #93C5FD;
+      /* blue-300 */
+      --color-primary-content: #0F172A;
+      /* dark contrast for light blue */
+      --color-secondary: #38BDF8;
+      /* sky-400 */
+      --color-base-100: #111827;
+      /* gray-900 */
+      --color-base-200: #1F2937;
+      /* gray-800 */
+      --color-base-300: #374151;
+      /* gray-700 */
+      --color-base-content: #F3F4F6;
+      /* gray-100 */
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css" />
   <script type="importmap">
 {
   "imports": {
@@ -101,10 +124,12 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-base-200 transition-colors duration-300">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+
+<body class="bg-base-200 transition-colors duration-300">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
 </html>

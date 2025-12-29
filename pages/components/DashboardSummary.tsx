@@ -22,12 +22,12 @@ const ScoreChart: React.FC<{ entries: HistoryEntry[] }> = ({ entries }) => {
         return { x, y, score, date: new Date(entry.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) };
     });
 
-    const linePoints = points.map(p => `${p.x},${p.y}`).join(' ');
-    const areaPoints = `${points[0].x},100 ${linePoints} ${points[points.length - 1].x},100`;
+    const pathData = points.length > 0 ? `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ') : '';
+    const areaPathData = points.length > 0 ? `${pathData} L ${points[points.length - 1].x} 100 L ${points[0].x} 100 Z` : '';
 
     useEffect(() => {
         const path = svgRef.current?.querySelector('.score-line-path');
-        if (path instanceof SVGPolylineElement) {
+        if (path instanceof SVGPathElement) {
             const length = path.getTotalLength();
             path.style.strokeDasharray = String(length);
             path.style.strokeDashoffset = String(length);
@@ -50,18 +50,18 @@ const ScoreChart: React.FC<{ entries: HistoryEntry[] }> = ({ entries }) => {
                         <stop offset="100%" className="text-primary" stopOpacity="0" />
                     </linearGradient>
                 </defs>
-                <polyline
-                    points={areaPoints}
+                <path
+                    d={areaPathData}
                     className="fill-primary"
                     style={{ fill: 'url(#scoreGradient)' }}
                 />
-                <polyline
+                <path
                     className="score-line-path stroke-primary"
                     fill="none"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    points={linePoints}
+                    d={pathData}
                 />
             </svg>
 

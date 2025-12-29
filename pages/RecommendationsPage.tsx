@@ -188,28 +188,28 @@ const RecommendationsPage = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {categoryProducts.map(product => (
-                  <Card key={product.id} className="p-0 flex flex-col relative overflow-hidden hover:shadow-lg transition-shadow bg-slate-800 border-slate-700">
+                  <Card key={product.id} className="p-0 flex flex-col relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-base-100 border-base-300">
                     <div className="p-5 flex flex-col flex-grow">
                       <div className="mb-2">
-                        <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${product.price_tier === 'budget' ? 'bg-green-900/50 text-green-400' :
-                          product.price_tier === 'premium' ? 'bg-purple-900/50 text-purple-400' :
-                            'bg-blue-900/50 text-blue-400'
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${product.price_tier === 'budget' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' :
+                          product.price_tier === 'premium' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' :
+                            'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
                           }`}>
                           {product.price_tier === 'budget' ? 'Económico' :
                             product.price_tier === 'premium' ? 'Premium' : 'Calidad/Precio'}
                         </span>
                       </div>
 
-                      <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 min-h-[3.5rem]">
+                      <h3 className="text-lg font-bold text-base-content mb-3 line-clamp-2 min-h-[3.5rem] leading-tight">
                         {product.product_name}
                       </h3>
 
-                      <div className="mt-auto pt-4 border-t border-slate-700">
+                      <div className="mt-auto pt-4 border-t border-base-200">
                         <a
                           href={product.affiliate_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block w-full px-4 py-3 text-sm font-bold text-white bg-cyan-600 rounded-lg shadow-lg hover:bg-cyan-500 transition-all duration-200 hover:-translate-y-0.5 text-center"
+                          className="block w-full px-4 py-3 text-sm font-bold text-primary-content bg-primary rounded-xl shadow-md hover:bg-primary-focus transition-all duration-200 hover:-translate-y-0.5 text-center"
                         >
                           Ver en Amazon <i className="iconoir-arrow-right ml-1"></i>
                         </a>
@@ -241,26 +241,26 @@ const RecommendationsPage = () => {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {otherProducts.map(product => (
-                  <Card key={product.id} className="p-0 flex flex-col relative overflow-hidden hover:shadow-lg transition-shadow bg-slate-800 border-slate-700">
+                  <Card key={product.id} className="p-0 flex flex-col relative overflow-hidden hover:shadow-lg transition-all duration-300 bg-base-100 border-base-300">
                     <div className="p-5 flex flex-col flex-grow">
                       <div className="mb-2">
-                        <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${product.price_tier === 'budget' ? 'bg-green-900/50 text-green-400' :
-                          product.price_tier === 'premium' ? 'bg-purple-900/50 text-purple-400' :
-                            'bg-blue-900/50 text-blue-400'
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${product.price_tier === 'budget' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' :
+                          product.price_tier === 'premium' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' :
+                            'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
                           }`}>
                           {product.price_tier === 'budget' ? 'Económico' :
                             product.price_tier === 'premium' ? 'Premium' : 'Calidad/Precio'}
                         </span>
                       </div>
-                      <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 min-h-[3.5rem]">
+                      <h3 className="text-lg font-bold text-base-content mb-3 line-clamp-2 min-h-[3.5rem] leading-tight">
                         {product.product_name}
                       </h3>
-                      <div className="mt-auto pt-4 border-t border-slate-700">
+                      <div className="mt-auto pt-4 border-t border-base-200">
                         <a
                           href={product.affiliate_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block w-full px-4 py-3 text-sm font-bold text-white bg-cyan-600 rounded-lg shadow-lg hover:bg-cyan-500 transition-all duration-200 hover:-translate-y-0.5 text-center"
+                          className="block w-full px-4 py-3 text-sm font-bold text-primary-content bg-primary rounded-xl shadow-md hover:bg-primary-focus transition-all duration-200 hover:-translate-y-0.5 text-center"
                         >
                           Ver en Amazon <i className="iconoir-arrow-right ml-1"></i>
                         </a>
@@ -274,10 +274,10 @@ const RecommendationsPage = () => {
         })()}
       </div>
 
-      <Card className="mt-12 bg-slate-800 border-slate-700">
+      <Card className="mt-12 bg-base-200 border-base-300">
         <div className="text-center">
-          <i className="iconoir-info-circle text-3xl text-cyan-500 mb-2"></i>
-          <p className="text-sm text-gray-400">
+          <i className="iconoir-info-circle text-3xl text-primary mb-2"></i>
+          <p className="text-sm text-base-content/70">
             Estos productos contienen los ingredientes recomendados en tu rutina.
             Los enlaces son de afiliados, lo que nos ayuda a mantener SkinAI.
           </p>

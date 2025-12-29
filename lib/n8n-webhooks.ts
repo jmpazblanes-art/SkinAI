@@ -30,7 +30,8 @@ interface SkinAnalysisResponse {
  */
 export async function callSkinAnalysisWebhook(
   userId: string,
-  imageBase64: string
+  imageBase64: string,
+  metadata?: { birthDate?: string }
 ): Promise<SkinAnalysisResponse> {
   try {
     console.log('=== CALLING SUPABASE EDGE FUNCTION ===');
@@ -39,7 +40,8 @@ export async function callSkinAnalysisWebhook(
     const { data, error } = await supabase.functions.invoke('analyze-skin', {
       body: {
         image: imageBase64,
-        user_id: userId
+        user_id: userId,
+        birth_date: metadata?.birthDate
       }
     });
 

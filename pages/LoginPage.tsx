@@ -77,21 +77,21 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-base-200 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex items-center justify-center gap-3">
             <div className="bg-gradient-to-br from-primary to-secondary p-3 rounded-xl shadow-lg">
-              <i className="iconoir-camera text-4xl text-white"></i>
+              <i className="iconoir-camera text-4xl text-primary-content"></i>
             </div>
-            <h1 className="text-5xl font-extrabold text-neutral-800 dark:text-neutral-200">
+            <h1 className="text-5xl font-extrabold text-base-content">
               Skin<span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">AI</span>
             </h1>
           </div>
-          <h2 className="mt-6 text-center text-2xl font-bold text-gray-900 dark:text-gray-200">
+          <h2 className="mt-6 text-center text-2xl font-bold text-base-content">
             {isSignup ? 'Crea tu cuenta' : 'Inicia sesión en tu cuenta'}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-center text-sm text-base-content/60">
             {isSignup ? '¿Ya tienes una cuenta? ' : '¿No tienes una cuenta? '}
             <button
               type="button"
@@ -116,18 +116,18 @@ const LoginPage = () => {
                   onChange={(e) => setName(e.target.value)}
                 />
                 <div>
-                  <label htmlFor="plan" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="plan" className="block text-sm font-medium text-base-content mb-2">
                     Selecciona tu plan
                   </label>
                   <select
                     id="plan"
                     value={plan}
                     onChange={(e) => setPlan(e.target.value as 'free' | 'monthly' | 'annual')}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-neutral-800 text-gray-900 dark:text-gray-100"
+                    className="w-full px-3 py-2 border border-base-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-base-100 text-base-content"
                   >
-                    <option value="free">Plan Gratuito - 5 análisis/mes</option>
-                    <option value="monthly">Plan Mensual - €4.99/mes - Análisis ilimitados</option>
-                    <option value="annual">Plan Anual - €39.99/año - Análisis ilimitados + 2 meses gratis</option>
+                    <option value="free" className="bg-base-100">Plan Gratuito - 5 análisis/mes</option>
+                    <option value="monthly" className="bg-base-100">Plan Mensual - €4.99/mes - Análisis ilimitados</option>
+                    <option value="annual" className="bg-base-100">Plan Anual - €39.99/año - Análisis ilimitados + 2 meses gratis</option>
                   </select>
                 </div>
               </>
@@ -165,7 +165,7 @@ const LoginPage = () => {
                   />
                 </div>
                 <div className="ml-3 text-sm">
-                  <label htmlFor="terms" className="font-medium text-gray-700 dark:text-gray-300">
+                  <label htmlFor="terms" className="font-medium text-base-content/80">
                     Entiendo que esta app ofrece sugerencias de cuidado estético y NO es consejo médico. Acepto los <a href="/terms" className="text-primary hover:text-primary-focus">Términos de Uso</a>.
                   </label>
                 </div>

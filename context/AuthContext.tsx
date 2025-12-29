@@ -12,6 +12,7 @@ interface AuthContextType {
   signup: (email: string, password: string, name: string, plan: 'monthly' | 'annual' | 'free', hasAcceptedTerms: boolean) => Promise<{ needsCheckout: boolean; checkoutUrl?: string }>;
   logout: () => Promise<void>;
   updateProfilePicture: (newPictureUrl: string) => void;
+  activateProCode: (code: string) => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,23 +21,52 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Convert Supabase AuthUser to our User type
-  // IMPORTANT: Uses auth.id directly (auth_user_id), NOT users table ID
-  const mapAuthUserToUser = (authUser: AuthUser): User => {
+  // Convert Supabase AuthUser to our User type and fetch subscription_tier from public.users
+  const mapAuthUserToUser = async (authUser: AuthUser): Promise<User> => {
+    let subscriptionTier: 'free' | 'pro' = 'free';
+
+    // TEMPORAL: Comentado hasta que la tabla users esté configurada correctamente
+    /*
+    try {
+      // Fetch subscription_tier from public.users table
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', authUser.id)
+        .single();
+
+      if (error) {
+        console.warn('⚠️ Error fetching user subscription:', error.message);
+        console.warn('⚠️ Usando tier por defecto: free');
+      } else if (userData?.subscription_tier) {
+        subscriptionTier = userData.subscription_tier as 'free' | 'pro';
+      }
+    } catch (err) {
+      console.error('❌ Error en mapAuthUserToUser:', err);
+    }
+    */
+
+    // TEMPORAL: Usar metadata como fallback
+    if (authUser.user_metadata?.subscription_tier) {
+      subscriptionTier = authUser.user_metadata.subscription_tier as 'free' | 'pro';
+    }
+
     return {
-      id: authUser.id,  // Use Auth ID directly (this is sent to n8n as auth_user_id)
+      id: authUser.id,
       email: authUser.email || '',
       name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'Usuario',
       birthDate: authUser.user_metadata?.birth_date,
       profilePictureUrl: authUser.user_metadata?.profile_picture_url || 'https://picsum.photos/seed/default/200/200',
+      subscription_tier: subscriptionTier,
     };
   };
 
   useEffect(() => {
     // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        setUser(mapAuthUserToUser(session.user));
+        const mappedUser = await mapAuthUserToUser(session.user);
+        setUser(mappedUser);
       }
       setIsLoading(false);
     });
@@ -44,9 +74,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        setUser(mapAuthUserToUser(session.user));
+        const mappedUser = await mapAuthUserToUser(session.user);
+        setUser(mappedUser);
       } else {
         setUser(null);
       }
@@ -66,9 +97,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     if (data.user) {
-      const mappedUser = mapAuthUserToUser(data.user);
+      const mappedUser = await mapAuthUserToUser(data.user);
       console.log('🔑 Login successful. User auth_user_id:', mappedUser.id);
       console.log('📧 Email:', mappedUser.email);
+      console.log('💎 Subscription tier:', mappedUser.subscription_tier);
       setUser(mappedUser);
     }
   };
@@ -136,8 +168,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const activateProCode = async (code: string): Promise<boolean> => {
+    // CÓDIGO SECRETO PARA TESTEO
+    const SECRET_CODE = "SKINAI_PRO_TEST";
+
+    if (code.trim().toUpperCase() === SECRET_CODE) {
+      if (user) {
+        // Actualizar en base de Datos (Metadata)
+        const { error } = await supabase.auth.updateUser({
+          data: { subscription_tier: 'pro' }
+        });
+
+        if (error) {
+          console.error("Error actualizando a PRO:", error);
+          return false;
+        }
+
+        // Actualizar estado local
+        setUser({ ...user, subscription_tier: 'pro' });
+        return true;
+      }
+    }
+    return false;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, signup, logout, updateProfilePicture }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, signup, logout, updateProfilePicture, activateProCode }}>
       {children}
     </AuthContext.Provider>
   );

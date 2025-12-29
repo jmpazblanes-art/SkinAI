@@ -72,15 +72,15 @@ const AnalysisResultsDisplay: React.FC<AnalysisResultsDisplayProps> = ({ result,
 
             {/* Verdict Section */}
             {(result.mensaje_motivador || result.analisis?.analisis_general) && (
-                <div className="mb-8 p-6 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-primary/20 shadow-lg relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <div className="mb-8 p-6 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-sm relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                         <i className="iconoir-quote-solid text-6xl text-primary"></i>
                     </div>
                     <h3 className="text-xl font-bold text-primary mb-3 flex items-center">
                         <i className="iconoir-magic-wand mr-2"></i>
                         El Veredicto de SkinAI
                     </h3>
-                    <p className="text-lg text-gray-300 leading-relaxed italic relative z-10">
+                    <p className="text-lg text-base-content leading-relaxed italic relative z-10 font-medium">
                         "{result.mensaje_motivador || result.analisis?.analisis_general}"
                     </p>
                 </div>
@@ -110,8 +110,15 @@ const AnalysisResultsDisplay: React.FC<AnalysisResultsDisplayProps> = ({ result,
                     </div>
                     <div className="flex flex-col items-center sm:items-start justify-center p-4 bg-base-200 rounded-lg h-full">
                         <h3 className="text-lg font-semibold mb-2">Tipo de Piel</h3>
-                        <p className="capitalize text-primary font-bold text-3xl">{result.analisis?.tipo_piel || 'Normal'}</p>
-                        <p className="text-sm text-gray-500 mt-2">Edad aparente: {result.analisis?.edad_aparente} años</p>
+                        <p className="text-primary font-bold text-3xl">
+                            {result.analisis?.tipo_piel === 'oily' ? 'Grasa' :
+                                result.analisis?.tipo_piel === 'dry' ? 'Seca' :
+                                    result.analisis?.tipo_piel === 'combination' ? 'Mixta' :
+                                        result.analisis?.tipo_piel === 'sensitive' ? 'Sensible' :
+                                            result.analisis?.tipo_piel === 'normal' ? 'Normal' :
+                                                result.analisis?.tipo_piel || 'Normal'}
+                        </p>
+                        <p className="text-sm text-base-content/60 mt-2">Edad aparente: <span className="font-semibold text-base-content">{result.analisis?.edad_aparente} años</span></p>
                     </div>
                 </div>
             </div>
@@ -184,7 +191,7 @@ const AnalysisResultsDisplay: React.FC<AnalysisResultsDisplayProps> = ({ result,
                                                             href={product.affiliate_url}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-bold text-white bg-cyan-600 rounded-lg hover:bg-cyan-500 transition-colors shadow-sm"
+                                                            className="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-bold text-primary-content bg-primary rounded-lg hover:bg-primary-focus transition-colors shadow-sm"
                                                         >
                                                             Ver en Amazon <i className="iconoir-arrow-right ml-1"></i>
                                                         </a>
@@ -243,7 +250,7 @@ const AnalysisResultsDisplay: React.FC<AnalysisResultsDisplayProps> = ({ result,
                                                             href={product.affiliate_url}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-bold text-white bg-cyan-600 rounded-lg hover:bg-cyan-500 transition-colors shadow-sm"
+                                                            className="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-bold text-primary-content bg-primary rounded-lg hover:bg-primary-focus transition-colors shadow-sm"
                                                         >
                                                             Ver en Amazon <i className="iconoir-arrow-right ml-1"></i>
                                                         </a>
