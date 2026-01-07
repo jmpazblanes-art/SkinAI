@@ -25,8 +25,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const mapAuthUserToUser = async (authUser: AuthUser): Promise<User> => {
     let subscriptionTier: 'free' | 'pro' = 'free';
 
-    // TEMPORAL: Comentado hasta que la tabla users esté configurada correctamente
-    /*
     try {
       // Fetch subscription_tier from public.users table
       const { data: userData, error } = await supabase
@@ -44,7 +42,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (err) {
       console.error('❌ Error en mapAuthUserToUser:', err);
     }
-    */
 
     // TEMPORAL: Usar metadata como fallback
     if (authUser.user_metadata?.subscription_tier) {
@@ -143,6 +140,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     console.log('✅ Signup successful. Using Auth user ID:', newUser.id);
     setUser(newUser);
+
+    // Step 3: If plan is not free, get checkout URL from Stripe Edge Function
+    if (plan !== 'free') {
+      try {
+        const priceId = plan === 'monthly'
+          ? 'price_1SjhRAEfruJcNACvSNcHGpI9'
+          : 'price_1SjhzdEfruJcNACvCHJqngpG';
+
+        const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('stripe-checkout', {
+          body: {
+            price_id: priceId,
+            user_id: authUserId,
+            return_url: window.location.origin
+          }
+        });
+
+        if (checkoutError) throw checkoutError;
+        if (checkoutData?.url) {
+          return {
+            needsCheckout: true,
+            checkoutUrl: checkoutData.url
+          };
+        }
+      } catch (err) {
+        console.error('❌ Error getting checkout URL:', err);
+        // We still let them sign up, but they might need to subscribe manually later
+      }
+    }
 
     return {
       needsCheckout: false,

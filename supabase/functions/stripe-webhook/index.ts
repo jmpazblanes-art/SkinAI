@@ -1,11 +1,10 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7"
-import Stripe from "https://esm.sh/stripe@14.16.0?target=deno"
+import { createClient } from "npm:@supabase/supabase-js@^2.39.7"
+import Stripe from "npm:stripe@^14.16.0"
 
 const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET')
 
-serve(async (req) => {
+Deno.serve(async (req) => {
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
         apiVersion: '2023-10-16',
     })

@@ -44,7 +44,7 @@ const LoginPage = () => {
           throw new Error('Debes aceptar los términos de uso');
         }
 
-        // Llamar al webhook de n8n a través del AuthContext
+        // Registrar usuario a través del AuthContext
         const result = await signup(email, password, name, plan, hasAcceptedTerms);
 
         // Si el plan es de pago, redirigir a Stripe
