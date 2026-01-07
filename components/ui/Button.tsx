@@ -16,7 +16,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   icon,
   ...props
 }, ref) => {
-  const baseClasses = 'inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-semibold rounded-xl shadow focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg';
+  const baseClasses = 'inline-flex items-center justify-center px-4 py-3 sm:px-8 sm:py-4 border border-transparent text-sm sm:text-base font-semibold rounded-xl shadow focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg';
 
   const variantClasses = {
     primary: 'text-primary-content bg-primary hover:bg-primary-focus focus:ring-primary',

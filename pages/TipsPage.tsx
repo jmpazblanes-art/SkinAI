@@ -14,9 +14,9 @@ const TipItem: React.FC<{ icon: string; title: string; children: React.ReactNode
 const TipsPage = () => {
     return (
         <div>
-            <h1 className="text-3xl font-bold text-base-content mb-2">Consejos para una Piel Saludable</h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">Una colección de buenas prácticas para cuidar tu piel todos los días.</p>
-            
+            <h1 className="text-2xl sm:text-3xl font-bold text-base-content mb-2">Consejos para una Piel Saludable</h1>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-6">Una colección de buenas prácticas para cuidar tu piel todos los días.</p>
+
             <Card>
                 <ul className="space-y-4">
                     <TipItem icon="droplet" title="Hidratación es clave">Bebe suficiente agua durante el día para mantener tu piel hidratada desde adentro.</TipItem>

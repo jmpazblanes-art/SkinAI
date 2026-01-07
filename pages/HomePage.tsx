@@ -159,10 +159,10 @@ const HomePage = () => {
 
   return (
     <div>
-      <h1 className="text-5xl sm:text-6xl font-extrabold text-base-content mb-3 leading-tight">
+      <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-base-content mb-3 leading-tight">
         Análisis Facial con <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Inteligencia Artificial</span>
       </h1>
-      <p className="text-lg text-base-content/80 max-w-2xl mb-6 leading-loose">
+      <p className="text-base sm:text-lg text-base-content/80 max-w-2xl mb-6 leading-loose">
         Sube una foto de tu rostro y recibe un análisis detallado de tu piel con recomendaciones personalizadas para mejorar tu cuidado facial.
       </p>
 
@@ -188,12 +188,13 @@ const HomePage = () => {
               className="hidden"
               aria-labelledby="upload-button"
             />
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4">
               <Button
                 id="upload-button"
                 onClick={() => fileInputRef.current?.click()}
                 variant="secondary"
                 icon={<i className="iconoir-cloud-upload mr-2"></i>}
+                className="w-full sm:w-auto"
               >
                 Subir foto
               </Button>
@@ -201,10 +202,16 @@ const HomePage = () => {
                 onClick={() => setIsCameraOpen(true)}
                 variant="secondary"
                 icon={<i className="iconoir-camera mr-2"></i>}
+                className="w-full sm:w-auto"
               >
                 Tomar foto
               </Button>
-              <Button onClick={handleAnalyzeClick} isLoading={isLoading} disabled={!selectedFile}>
+              <Button
+                onClick={handleAnalyzeClick}
+                isLoading={isLoading}
+                disabled={!selectedFile}
+                className="w-full sm:w-auto"
+              >
                 Analizar <i className="iconoir-arrow-right ml-2"></i>
               </Button>
             </div>

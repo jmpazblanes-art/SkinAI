@@ -162,9 +162,9 @@ const RecommendationsPage = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto pb-12">
-      <h1 className="text-3xl font-bold text-base-content mb-2">Productos sugeridos</h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-8">
+    <div className="max-w-7xl mx-auto pb-12 px-4 sm:px-0">
+      <h1 className="text-2xl sm:text-3xl font-bold text-base-content mb-2">Productos sugeridos</h1>
+      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-8">
         Selección de productos basada en los ingredientes clave de tu rutina ({latestAnalysis.result.analisis?.tipo_piel || 'normal'}).
       </p>
 

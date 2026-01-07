@@ -39,8 +39,8 @@ const SubscriptionPage = () => {
         try {
             // IDs de precios de Stripe reales (Modo Pago de Prueba)
             const priceId = planType === 'monthly'
-                ? 'price_1ShTgDEfruJcNACvAwbS0otW'
-                : 'price_1ShTgmEfruJcNACvPwzOMzuE';
+                ? 'price_1SjhRAEfruJcNACvSNcHGpI9'
+                : 'price_1SjhzdEfruJcNACvCHJqngpG';
 
             console.log('📡 Llamando a Edge Function stripe-checkout con priceId:', priceId);
             const { data, error } = await supabase.functions.invoke('stripe-checkout', {

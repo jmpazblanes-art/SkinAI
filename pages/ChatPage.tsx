@@ -94,17 +94,17 @@ const ChatPage = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto h-[calc(100vh-160px)] flex flex-col pt-4">
-            <div className="flex items-center justify-between mb-8 px-4">
+        <div className="max-w-4xl mx-auto h-[calc(100vh-120px)] sm:h-[calc(100vh-160px)] flex flex-col pt-2 sm:pt-4">
+            <div className="flex items-center justify-between mb-4 sm:mb-8 px-4">
                 <div className="animate-fade-in">
-                    <h1 className="text-3xl font-extrabold text-base-content tracking-tight">Tu Skin Coach IA</h1>
-                    <p className="text-base-content/60 text-sm font-medium mt-1 flex items-center gap-2">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">Tu Skin Coach IA</h1>
+                    <p className="text-base-content/60 text-[10px] sm:text-sm font-medium mt-1 flex items-center gap-2">
                         <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                         Asistente experto en dermocosmética
                     </p>
                 </div>
-                <div className="hidden sm:block">
-                    <span className="bg-primary/20 text-primary border border-primary/30 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.1em] shadow-sm backdrop-blur-md">
+                <div className="hidden xs:block">
+                    <span className="bg-primary/20 text-primary border border-primary/30 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] shadow-sm backdrop-blur-md">
                         Miembro PRO
                     </span>
                 </div>
@@ -125,7 +125,7 @@ const ChatPage = () => {
                 </div>
 
                 {/* Messages Container */}
-                <div className="flex-grow overflow-y-auto p-6 space-y-6 bg-transparent custom-scrollbar">
+                <div className="flex-grow overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 bg-transparent custom-scrollbar">
                     {messages.map((msg, idx) => (
                         <div
                             key={idx}
@@ -133,12 +133,12 @@ const ChatPage = () => {
                             style={{ animationDelay: `${idx * 0.05}s` }}
                         >
                             <div
-                                className={`max-w-[85%] sm:max-w-2xl p-5 rounded-2xl shadow-sm ${msg.role === 'user'
+                                className={`max-w-[90%] sm:max-w-[85%] lg:max-w-2xl p-3 sm:p-5 rounded-2xl shadow-sm ${msg.role === 'user'
                                     ? 'bg-primary text-primary-content rounded-tr-none shadow-md shadow-primary/10'
                                     : 'bg-base-100 text-base-content rounded-tl-none border border-base-300/80'
                                     }`}
                             >
-                                <p className="text-[15px] leading-relaxed font-medium whitespace-pre-wrap">
+                                <p className="text-sm sm:text-[15px] leading-relaxed font-medium whitespace-pre-wrap">
                                     {msg.content}
                                 </p>
                             </div>
@@ -146,7 +146,7 @@ const ChatPage = () => {
                     ))}
                     {isLoading && (
                         <div className="flex justify-start">
-                            <div className="bg-base-200/50 border border-base-300 p-4 rounded-2xl rounded-tl-none shadow-sm flex gap-1.5 px-6">
+                            <div className="bg-base-200/50 border border-base-300 p-3 sm:p-4 rounded-2xl rounded-tl-none shadow-sm flex gap-1.5 px-4 sm:px-6">
                                 <span className="w-2 h-2 bg-primary rounded-full animate-bounce"></span>
                                 <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.2s]"></span>
                                 <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.4s]"></span>
@@ -157,31 +157,31 @@ const ChatPage = () => {
                 </div>
 
                 {/* Disclaimer info */}
-                <div className="px-6 py-2 border-t border-base-300/30 bg-base-200/20">
-                    <p className="text-[10px] text-center text-base-content/40 font-medium italic">
+                <div className="px-4 sm:px-6 py-2 border-t border-base-300/30 bg-base-200/20">
+                    <p className="text-[9px] sm:text-[10px] text-center text-base-content/40 font-medium italic">
                         * Las recomendaciones son exclusivamente cosméticas. Consulta a un asistente inteligente para análisis cosméticos.
                     </p>
                 </div>
 
                 {/* Input area */}
-                <div className="p-5 bg-base-200/40 backdrop-blur-md border-t border-base-300">
-                    <div className="relative flex items-center gap-3">
+                <div className="p-3 sm:p-5 bg-base-200/40 backdrop-blur-md border-t border-base-300">
+                    <div className="relative flex items-center gap-2 sm:gap-3">
                         <Input
-                            placeholder="Pregunta sobre tu piel, rutinas o ingredientes..."
+                            placeholder="Pregunta sobre tu piel..."
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                            className="flex-grow bg-base-100 border-base-300 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all rounded-xl py-4 pl-4 pr-12 text-base shadow-inner"
+                            className="flex-grow bg-base-100 border-base-300 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all rounded-xl py-3 sm:py-4 pl-4 pr-12 text-sm sm:text-base shadow-inner"
                             disabled={isLoading}
                         />
-                        <div className="absolute right-2 flex items-center">
+                        <div className="absolute right-1.5 sm:right-2 flex items-center">
                             <Button
                                 onClick={handleSend}
                                 isLoading={isLoading}
                                 disabled={!input.trim()}
-                                className="w-10 h-10 min-h-0 p-0 flex items-center justify-center rounded-lg bg-primary hover:bg-primary-focus text-primary-content shadow-lg shadow-primary/20 transform active:scale-95 transition-all"
+                                className="w-9 h-9 sm:w-10 sm:h-10 min-h-0 p-0 flex items-center justify-center rounded-lg bg-primary hover:bg-primary-focus text-primary-content shadow-lg shadow-primary/20 transform active:scale-95 transition-all"
                             >
-                                {!isLoading && <i className="iconoir-send text-xl"></i>}
+                                {!isLoading && <i className="iconoir-send text-lg sm:text-xl"></i>}
                             </Button>
                         </div>
                     </div>

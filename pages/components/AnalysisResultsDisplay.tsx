@@ -11,8 +11,8 @@ const ScoreRing: React.FC<{ score: number }> = ({ score }) => {
     const colorClass = score > 80 ? 'stroke-primary' : score > 60 ? 'stroke-yellow-500' : 'stroke-red-500';
 
     return (
-        <div className="relative flex items-center justify-center w-32 h-32">
-            <svg className="transform -rotate-90" width="120" height="120" viewBox="0 0 100 100" aria-label={`Puntuación de la piel: ${score} de 100`}>
+        <div className="relative flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32">
+            <svg className="transform -rotate-90 w-20 h-20 sm:w-[120px] sm:h-[120px]" viewBox="0 0 100 100" aria-label={`Puntuación de la piel: ${score} de 100`}>
                 <title>Puntuación de la piel: ${score} de 100</title>
                 <circle cx="50" cy="50" r="45" stroke="currentColor" className="text-base-300" strokeWidth="10" fill="transparent" />
                 <circle
@@ -25,7 +25,7 @@ const ScoreRing: React.FC<{ score: number }> = ({ score }) => {
                     strokeLinecap="round"
                 />
             </svg>
-            <span className="absolute text-3xl font-bold text-base-content">{score}</span>
+            <span className="absolute text-2xl sm:text-3xl font-bold text-base-content">{score}</span>
         </div>
     );
 };
@@ -164,9 +164,9 @@ const AnalysisResultsDisplay: React.FC<AnalysisResultsDisplayProps> = ({ result,
 
                                         {product && (
                                             <div className="p-4 bg-base-100/50">
-                                                <div className="flex gap-4">
+                                                <div className="flex flex-col xs:flex-row gap-4">
                                                     {product.image_url && (
-                                                        <div className="w-20 h-20 flex-shrink-0 bg-white rounded-lg p-2 flex items-center justify-center border border-base-200">
+                                                        <div className="w-full xs:w-20 h-28 xs:h-20 flex-shrink-0 bg-white rounded-lg p-2 flex items-center justify-center border border-base-200">
                                                             <LazyImage
                                                                 src={product.image_url}
                                                                 alt={product.product_name}
@@ -223,9 +223,9 @@ const AnalysisResultsDisplay: React.FC<AnalysisResultsDisplayProps> = ({ result,
 
                                         {product && (
                                             <div className="p-4 bg-base-100/50">
-                                                <div className="flex gap-4">
+                                                <div className="flex flex-col xs:flex-row gap-4">
                                                     {product.image_url && (
-                                                        <div className="w-20 h-20 flex-shrink-0 bg-white rounded-lg p-2 flex items-center justify-center border border-base-200">
+                                                        <div className="w-full xs:w-20 h-28 xs:h-20 flex-shrink-0 bg-white rounded-lg p-2 flex items-center justify-center border border-base-200">
                                                             <LazyImage
                                                                 src={product.image_url}
                                                                 alt={product.product_name}
