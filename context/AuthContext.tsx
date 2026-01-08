@@ -60,10 +60,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   useEffect(() => {
+    console.log('🔄 Iniciando verificación de sesión...');
+
+    // Safety timeout: ensure loading stops after 4s no matter what
+    const timer = setTimeout(() => {
+      console.warn('⚠️ La carga de auth tardó demasiado. Forzando fin de carga.');
+      setIsLoading(false);
+    }, 4000);
+
     // Check active session
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('📊 Sesión recuperada:', session ? 'Usuario logueado' : 'No hay sesión');
+
         if (session?.user) {
           const mappedUser = await mapAuthUserToUser(session.user);
           setUser(mappedUser);
@@ -72,6 +82,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.error('❌ Error initializing auth:', err);
       } finally {
         setIsLoading(false);
+        clearTimeout(timer);
       }
     };
 
@@ -81,6 +92,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log('🔔 Cambio en estado de auth:', _event);
       if (session?.user) {
         try {
           const mappedUser = await mapAuthUserToUser(session.user);
@@ -93,7 +105,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
