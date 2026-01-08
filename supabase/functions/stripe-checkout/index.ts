@@ -35,6 +35,7 @@ Deno.serve(async (req) => {
                 },
             ],
             mode: 'subscription',
+            allow_promotion_codes: true,
             success_url: `${return_url || 'http://localhost:3000'}/profile?success=true`,
             cancel_url: `${return_url || 'http://localhost:3000'}/subscription?canceled=true`,
             metadata: {
