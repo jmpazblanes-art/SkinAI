@@ -163,6 +163,32 @@ const ProfilePage = () => {
     }));
   };
 
+  const handleManageSubscription = async () => {
+    try {
+      addNotification('Cargando portal de suscripción...', 'info');
+      const { data, error } = await supabase.functions.invoke('stripe-portal', {
+        body: { return_url: window.location.href }
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err: any) {
+      console.error('Portal error:', err);
+      // Extraer mensaje del cuerpo si es posible
+      let msg = err.message;
+      if (err.context) {
+        try {
+          const body = await err.context.json();
+          if (body.error) msg = body.error;
+        } catch (e) { }
+      }
+      addNotification('Error al abrir el portal: ' + msg, 'error');
+    }
+  };
+
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Tu Perfil</h1>
@@ -178,6 +204,33 @@ const ProfilePage = () => {
                 <Button type="submit">Guardar Cambios</Button>
               </div>
             </form>
+          </Card>
+
+          <Card className="mt-8">
+            <h2 className="text-xl font-bold mb-2">Mi Suscripción</h2>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2">
+              <div>
+                <p className="text-gray-600 mb-2">
+                  Plan actual: <span className="font-bold text-primary capitalize">{user?.subscription_tier || 'Gratis'}</span>
+                </p>
+                <p className="text-sm text-gray-500">
+                  {user?.subscription_tier === 'pro'
+                    ? 'Gestiona tus pagos, facturas o cancela tu suscripción desde el portal de Stripe.'
+                    : 'Pásate a Pro para disfrutar de análisis ilimitados y soporte prioritario.'}
+                </p>
+              </div>
+              <div className="mt-4 sm:mt-0">
+                {user?.subscription_tier === 'pro' ? (
+                  <Button variant="secondary" onClick={handleManageSubscription}>
+                    <i className="iconoir-credit-card mr-2"></i> Gestionar Suscripción
+                  </Button>
+                ) : (
+                  <Button onClick={() => window.location.hash = '#/subscription'}>
+                    Ver Planes Pro
+                  </Button>
+                )}
+              </div>
+            </div>
           </Card>
 
           <Card className="mt-8">
