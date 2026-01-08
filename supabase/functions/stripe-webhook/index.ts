@@ -27,27 +27,51 @@ Deno.serve(async (req) => {
         console.log(`Processing event: ${event.type}`)
 
         if (event.type === 'checkout.session.completed') {
-            const session = event.data.object
-            const userId = session.metadata?.user_id
+            const session = event.data.object as any;
+            const userId = session.metadata?.user_id;
+            const customerEmail = session.customer_details?.email;
+
+            console.log(`🔔 Checkout completed for: ${customerEmail} (ID: ${userId})`);
+
+            const supabaseUrl = Deno.env.get('SUPABASE_URL');
+            const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+            const supabase = createClient(supabaseUrl!, supabaseKey!);
 
             if (userId) {
-                console.log(`Upgrading user ${userId} to Pro...`)
-
-                const supabaseUrl = Deno.env.get('SUPABASE_URL')
-                const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-                const supabase = createClient(supabaseUrl!, supabaseKey!)
-
+                console.log(`🚀 Upgrading user by ID: ${userId}`);
                 const { error } = await supabase
                     .from('users')
                     .update({ subscription_tier: 'pro' })
-                    .eq('id', userId)
+                    .eq('id', userId);
 
                 if (error) {
-                    console.error(`Error updating user ${userId}:`, error.message)
-                    return new Response('Error updating user', { status: 500 })
+                    console.error(`❌ Error updating user by ID ${userId}:`, error.message);
+                } else {
+                    console.log(`✅ User ${userId} successfully upgraded to Pro.`);
                 }
+            } else if (customerEmail) {
+                console.log(`🔍 No user_id in metadata. Searching by email: ${customerEmail}`);
+                const { data: userData, error: fetchError } = await supabase
+                    .from('users')
+                    .select('id')
+                    .eq('email', customerEmail)
+                    .single();
 
-                console.log(`User ${userId} successfully upgraded to Pro.`)
+                if (fetchError || !userData) {
+                    console.error(`❌ Could not find user with email ${customerEmail}:`, fetchError?.message);
+                } else {
+                    console.log(`🚀 Upgrading user found by email: ${userData.id}`);
+                    const { error: updateError } = await supabase
+                        .from('users')
+                        .update({ subscription_tier: 'pro' })
+                        .eq('id', userData.id);
+
+                    if (updateError) {
+                        console.error(`❌ Error updating user by email:`, updateError.message);
+                    } else {
+                        console.log(`✅ User with email ${customerEmail} upgraded to Pro.`);
+                    }
+                }
             }
         }
 
@@ -56,7 +80,7 @@ Deno.serve(async (req) => {
             headers: { 'Content-Type': 'application/json' }
         })
     } catch (err) {
-        console.error(`Webhook Error: ${err.message}`)
+        console.error(`❌ Webhook Error: ${err.message}`)
         return new Response(`Webhook Error: ${err.message}`, { status: 400 })
     }
 })
