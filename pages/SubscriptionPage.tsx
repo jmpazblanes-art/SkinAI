@@ -3,6 +3,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../services/supabaseClient';
+import { STRIPE_PRICES } from '../constants';
 
 const SubscriptionTier = ({ name, price, features, isPopular, onSelect, currentPlan }: { name: string, price: string, features: string[], isPopular?: boolean, onSelect: () => void, currentPlan: boolean }) => (
     <Card className={`text-center flex flex-col ${currentPlan ? 'border-2 border-primary' : 'border border-transparent'}`}>
@@ -39,8 +40,8 @@ const SubscriptionPage = () => {
         try {
             // IDs de precios de Stripe reales (Modo Pago de Prueba)
             const priceId = planType === 'monthly'
-                ? 'price_1SjhRAEfruJcNACvSNcHGpI9'
-                : 'price_1SjhzdEfruJcNACvCHJqngpG';
+                ? STRIPE_PRICES.MONTHLY
+                : STRIPE_PRICES.ANNUAL;
 
             console.log('📡 Llamando a Edge Function stripe-checkout con priceId:', priceId);
             const { data, error } = await supabase.functions.invoke('stripe-checkout', {

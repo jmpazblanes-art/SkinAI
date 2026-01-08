@@ -13,6 +13,11 @@ export const NAV_LINKS = [
   { name: 'Términos de Uso', path: '/terminos', icon: 'iconoir-page' },
 ];
 
+export const STRIPE_PRICES = {
+  MONTHLY: 'price_1SjhRAEfruJcNACvSNcHGpI9', // Plan Mensual €4,99
+  ANNUAL: 'price_1SjhzdEfruJcNACvCHJqngpG',  // Plan Anual €39,99
+};
+
 export const MOCK_ROUTINE: DailyRoutineStep[] = [
   { id: 'm1', time: 'morning', productType: 'Limpiador', instructions: 'Lava tu cara con un limpiador suave.', completed: false },
   { id: 'm2', time: 'morning', productType: 'Tónico', instructions: 'Aplica un tónico equilibrante.', completed: false },

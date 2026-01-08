@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { User as AuthUser } from '@supabase/supabase-js';
 import { supabase } from '../services/supabaseClient';
 import { User } from '../types';
+import { STRIPE_PRICES } from '../constants';
 
 
 interface AuthContextType {
@@ -145,8 +146,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (plan !== 'free') {
       try {
         const priceId = plan === 'monthly'
-          ? 'price_1SjhRAEfruJcNACvSNcHGpI9'
-          : 'price_1SjhzdEfruJcNACvCHJqngpG';
+          ? STRIPE_PRICES.MONTHLY
+          : STRIPE_PRICES.ANNUAL;
 
         const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('stripe-checkout', {
           body: {
