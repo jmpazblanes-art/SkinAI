@@ -65,7 +65,21 @@ const SubscriptionPage = () => {
             }
         } catch (error: any) {
             console.error('❌ Error al iniciar checkout:', error);
-            alert('Error al conectar con Stripe: ' + error.message);
+
+            // Intentar extraer el mensaje de error del cuerpo de la respuesta si es una Edge Function
+            let errorMessage = error.message;
+            if (error.context) {
+                try {
+                    const body = await error.context.json();
+                    if (body && body.error) {
+                        errorMessage = body.error;
+                    }
+                } catch (e) {
+                    // Si no se puede parsear el JSON, usar el mensaje original
+                }
+            }
+
+            alert('Error al conectar con Stripe: ' + errorMessage);
         } finally {
             setIsLoading(null);
         }

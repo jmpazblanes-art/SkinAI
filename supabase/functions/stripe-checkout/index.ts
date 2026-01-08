@@ -49,10 +49,14 @@ Deno.serve(async (req) => {
                 status: 200,
             }
         )
-    } catch (error) {
-        console.error('Error:', error.message)
+    } catch (error: any) {
+        console.error('❌ Stripe checkout error:', error);
         return new Response(
-            JSON.stringify({ error: error.message }),
+            JSON.stringify({
+                error: error.message,
+                type: error.type,
+                code: error.code
+            }),
             {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                 status: 400,
