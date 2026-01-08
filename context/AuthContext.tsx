@@ -27,12 +27,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let subscriptionTier: 'free' | 'pro' = 'free';
 
     try {
-      // Fetch subscription_tier from public.users table
-      const { data: userData, error } = await supabase
+      // Fetch subscription_tier from public.users table with timeout
+      const fetchPromise = supabase
         .from('users')
         .select('subscription_tier')
         .eq('id', authUser.id)
         .single();
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout fetching user data')), 5000)
+      );
+
+      const { data: userData, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
 
       if (error) {
         console.warn('⚠️ Error fetching user subscription:', error.message);
@@ -41,7 +47,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         subscriptionTier = userData.subscription_tier as 'free' | 'pro';
       }
     } catch (err) {
-      console.error('❌ Error en mapAuthUserToUser:', err);
+      console.error('❌ Error o Timeout en mapAuthUserToUser:', err);
+      console.warn('⚠️ Continuando con tier por defecto');
     }
 
     // TEMPORAL: Usar metadata como fallback
@@ -112,21 +119,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    console.log('🔑 Intentando login para:', email);
+
+    // Timeout para la operación de login completa
+    const loginPromise = supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) {
-      throw new Error(error.message);
-    }
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('El servidor no responde. Por favor, comprueba tu conexión.')), 10000)
+    );
 
-    if (data.user) {
-      const mappedUser = await mapAuthUserToUser(data.user);
-      console.log('🔑 Login successful. User auth_user_id:', mappedUser.id);
-      console.log('📧 Email:', mappedUser.email);
-      console.log('💎 Subscription tier:', mappedUser.subscription_tier);
-      setUser(mappedUser);
+    try {
+      const { data, error } = await Promise.race([loginPromise, timeoutPromise]) as any;
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data.user) {
+        console.log('✅ Auth exitoso. Mapeando usuario...');
+        // Intentar mapear con un timeout interno
+        const mappedUser = await mapAuthUserToUser(data.user);
+        console.log('🔑 Login completado. Bienvenido:', mappedUser.email);
+        setUser(mappedUser);
+      }
+    } catch (err: any) {
+      console.error('❌ Error en proceso de login:', err.message);
+      throw err;
     }
   };
 
