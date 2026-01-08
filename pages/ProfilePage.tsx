@@ -5,6 +5,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { useNotification } from '../context/NotificationContext';
 import LazyImage from '../components/ui/LazyImage';
+import { supabase } from '../services/supabaseClient';
 
 interface Reminder {
   enabled: boolean;
